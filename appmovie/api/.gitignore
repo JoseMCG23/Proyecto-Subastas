@@ -1,6 +1,6 @@
 #Composer
 /vendor/
-composer.lock
+#composer.lock
 # Configuración sensible (base de datos, claves, etc.)
 .env
 .env.local

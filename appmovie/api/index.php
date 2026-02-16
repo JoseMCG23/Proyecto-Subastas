@@ -20,9 +20,16 @@ require_once "middleware/AuthMiddleware.php";
 
 /***--- Agregar todos los modelos*/
 require_once "models/ActorModel.php";
+require_once "models/RolModel.php";
+require_once "models/SubastaModel.php";
+require_once "models/PujaModel.php";
+require_once "models/UsuarioModel.php";
+
 
 /***--- Agregar todos los controladores*/
 require_once "controllers/ActorController.php";
+require_once "controllers/usuario.php";
+
 
 //Enrutador
 require_once "routes/RoutesController.php";
