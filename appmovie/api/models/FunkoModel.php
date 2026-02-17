@@ -62,7 +62,7 @@ class FunkoModel
             $f->imagenes   = $imgM->getImagenesFunko($f->idFunko);
             $f->propietario = $this->getNombreDueno($f->vendedor_id);
 
-            // historial subastas (si aplica)
+           
             $sqlSub = "SELECT idsubasta, fechaInicio, fechafin, estado
                        FROM subasta
                        WHERE funko_id=$id
