@@ -29,12 +29,13 @@ require_once "models/UsuarioModel.php";
 /***--- Agregar todos los controladores*/
 require_once "controllers/ActorController.php";
 require_once "controllers/usuario.php";
+require_once "models/FunkoCategoriaModel.php";
+require_once "models/FunkoImagenModel.php";
+require_once "models/FunkoModel.php";
+require_once "controllers/funko.php";
 
 
 //Enrutador
 require_once "routes/RoutesController.php";
 $index = new RoutesController();
 $index->index();
-
-
-
