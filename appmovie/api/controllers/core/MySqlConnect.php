@@ -36,7 +36,7 @@ class MySqlConnect {
 	 * Ejecutar una setencia SQL tipo SELECT
 	 * @param $sql - string sentencia SQL
 	 * @param $resultType - tipo de formato del resultado (obj,asoc,num)
-	 * @return $resultType
+	 * @return array|null Lista de resultados (array de objetos/arrays) o NULL si no hay resultados
 	 */
 	//
 	public function executeSQL($sql,$resultType="obj") {

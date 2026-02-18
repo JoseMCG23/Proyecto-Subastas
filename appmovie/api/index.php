@@ -33,6 +33,7 @@ require_once "models/FunkoCategoriaModel.php";
 require_once "models/FunkoImagenModel.php";
 require_once "models/FunkoModel.php";
 require_once "controllers/funko.php";
+require_once "controllers/subasta.php";
 
 
 //Enrutador
