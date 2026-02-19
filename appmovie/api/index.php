@@ -34,7 +34,7 @@ require_once "models/FunkoImagenModel.php";
 require_once "models/FunkoModel.php";
 require_once "controllers/funko.php";
 require_once "controllers/subasta.php";
-
+require_once "controllers/puja.php";
 
 //Enrutador
 require_once "routes/RoutesController.php";
