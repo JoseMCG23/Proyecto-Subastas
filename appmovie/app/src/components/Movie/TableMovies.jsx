@@ -15,7 +15,7 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Edit, Plus, Trash2, ArrowLeft } from "lucide-react";
-import MovieService from "@/services/MovieService";
+import MovieService from "@/services/ejemplos de la profe/MovieService";
 import { useEffect, useState } from "react";
 import { LoadingGrid } from "../ui/custom/LoadingGrid";
 import { ErrorAlert } from "../ui/custom/ErrorAlert";
@@ -37,30 +37,30 @@ export default function TableMovies() {
     const [loading, setLoading] = useState(true);
     useEffect(() => {
         const fetchData = async () => {
-        try {
-            const response = await MovieService.getMovies();
-            console.log(response)
-            const result = response.data;
-            console.log(result)
-            if (result.success) {
-                setMovies(result.data || []);
-            } else {
-                setError(result.message || "Error desconocido");
+            try {
+                const response = await MovieService.getMovies();
+                console.log(response)
+                const result = response.data;
+                console.log(result)
+                if (result.success) {
+                    setMovies(result.data || []);
+                } else {
+                    setError(result.message || "Error desconocido");
+                }
+            } catch (err) {
+                setError(err.message || "Error al conectar con el servidor");
+            } finally {
+                setLoading(false);
             }
-        } catch (err) {
-            setError(err.message || "Error al conectar con el servidor");
-        } finally {
-            setLoading(false);
-        }
         };
         fetchData()
-    
+
     }, []);
 
-    if (loading) return <LoadingGrid type="grid" />; 
-    if (error) return <ErrorAlert title="Error al cargar películas" message={error} />; 
-    if (movies.length === 0) 
-    return <EmptyState message="No se encontraron películas en esta tienda." />; 
+    if (loading) return <LoadingGrid type="grid" />;
+    if (error) return <ErrorAlert title="Error al cargar películas" message={error} />;
+    if (movies.length === 0)
+        return <EmptyState message="No se encontraron películas en esta tienda." />;
 
     return (
         <div className="container mx-auto py-8">
@@ -88,15 +88,15 @@ export default function TableMovies() {
                         <TableRow>
                             {/* ()=>{} */}
                             {/* ()=>() */}
-                            {movieColumns.map((col)=>( 
-                                <TableHead key={col.key}  className="text-left font-semibold">
+                            {movieColumns.map((col) => (
+                                <TableHead key={col.key} className="text-left font-semibold">
                                     {col.label}
                                 </TableHead>
                             ))}
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {movies.map((movie)=>( 
+                        {movies.map((movie) => (
                             <TableRow key={movie.id}>
                                 <TableCell className="font-medium">{movie.title} </TableCell>
                                 <TableCell>{movie.year} </TableCell>
@@ -131,7 +131,7 @@ export default function TableMovies() {
             </div>
             <Button
                 type="button"
-                
+
                 className="flex items-center gap-2 bg-accent text-white hover:bg-accent/90 mt-6"
             >
                 <ArrowLeft x className="w-4 h-4" />

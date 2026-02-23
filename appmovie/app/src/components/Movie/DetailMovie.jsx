@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import MovieService from '../../services/MovieService';
+import MovieService from '../../services/ejemplos de la profe/MovieService';
 import { ErrorAlert } from "../ui/custom/ErrorAlert";
 // Shadcn UI Components
 import { Card, CardContent } from "@/components/ui/card";
@@ -32,7 +32,7 @@ export function DetailMovie() {
                 // Si la petición es exitosa, se guardan los datos
                 console.log(response.data)
                 setData(response.data);
-                if(!response.data.success){
+                if (!response.data.success) {
                     setError(response.data.message)
                 }
             } catch (err) {
@@ -57,13 +57,13 @@ export function DetailMovie() {
                 {/* Sección de la Imagen con año en Badge */}
                 <div className="relative flex-shrink-0 w-full md:w-1/4 lg:w-1/5 rounded-lg overflow-hidden shadow-xl">
                     <div className="aspect-[2/3] w-full bg-muted flex items-center justify-center">
-                        {movie.data.imagen?.image ? ( 
+                        {movie.data.imagen?.image ? (
                             <img
                                 src={`${BASE_URL}/${movie.data.imagen.image}`}
                                 alt={`Poster de ${movie.data.title}`}
                                 className="w-full h-full object-contain"
                             />
-                        ):(
+                        ) : (
                             <Film className="h-1/2 w-1/2 text-muted-foreground" />
                         )}
                     </div>
@@ -107,23 +107,23 @@ export function DetailMovie() {
                                     <Globe className="h-5 w-5 text-primary" />
                                     <span className="font-semibold">Idioma:</span>
                                     <p className="text-muted-foreground">
-                                    {movie.data.lang}
+                                        {movie.data.lang}
                                     </p>
                                 </div>
                             </div>
 
                             {/* Contenedor de dos columnas para géneros y actores */}
                             <div className="grid gap-4 md:grid-cols-2">
-                            {movie.data.genres && movie.data.genres.length > 0 && ( 
+                                {movie.data.genres && movie.data.genres.length > 0 && (
                                     <div>
                                         <div className="flex items-center gap-4 mb-2">
                                             <Film className="h-5 w-5 text-primary" />
                                             <span className="font-semibold">Géneros:</span>
                                         </div>
                                         <div className="flex flex-col space-y-1">
-                                            
-                                                {movie.data.genres.map((genre)=>(
-                                                <div key={genre.id}  className="flex items-center gap-2 py-1 px-2 text-sm">
+
+                                            {movie.data.genres.map((genre) => (
+                                                <div key={genre.id} className="flex items-center gap-2 py-1 px-2 text-sm">
                                                     <ChevronRight className="h-4 w-4 text-secondary" />
                                                     <span className="text-muted-foreground">
                                                         {genre.title}
@@ -141,12 +141,12 @@ export function DetailMovie() {
                                             <span className="font-semibold">Actores Principales:</span>
                                         </div>
                                         <div className="flex flex-col space-y-1">
-                                        
-                                                <div  className="flex items-center gap-2 py-1 px-2 text-sm">
-                                                    <Star className="h-4 w-4 text-secondary" />
-                                                    <span className="text-muted-foreground"> </span>
-                                                </div>
-                                        
+
+                                            <div className="flex items-center gap-2 py-1 px-2 text-sm">
+                                                <Star className="h-4 w-4 text-secondary" />
+                                                <span className="text-muted-foreground"> </span>
+                                            </div>
+
                                         </div>
                                     </div>
                                 )}
@@ -156,13 +156,13 @@ export function DetailMovie() {
                 </div>
             </div>
             <Button
-                        type="button"
-                        onClick={() => navigate(-1)}
-                        className="flex items-center gap-2 bg-accent text-white hover:bg-accent/90 mt-6" 
-                    >
-                        <ArrowLeft className="w-4 h-4" />
-                        Regresar
-                    </Button>
+                type="button"
+                onClick={() => navigate(-1)}
+                className="flex items-center gap-2 bg-accent text-white hover:bg-accent/90 mt-6"
+            >
+                <ArrowLeft className="w-4 h-4" />
+                Regresar
+            </Button>
         </div>
 
     );

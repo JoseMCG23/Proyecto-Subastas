@@ -8,10 +8,12 @@ import { PageNotFound } from './components/Home/PageNotFound'
 import TableMovies from './components/Movie/TableMovies'
 import { ListMovies } from './components/Movie/ListMovies'
 import { DetailMovie } from './components/Movie/DetailMovie'
-/////nuevo de cris
+/////nuevo de cris de usaurio
 import UserList from "@/components/User/UserList";
 import UserDetail from "@/components/User/UserDetail";
-
+/////nuevo de cris de funko
+import FunkoList from "@/components/Funko/FunkoList";
+import FunkoDetail from "@/components/Funko/FunkoDetail";
 const rutas = createBrowserRouter([
   {
     element: <Layout/>,
@@ -26,9 +28,12 @@ const rutas = createBrowserRouter([
       {path:"movie", element: <ListMovies/>},
       {path:"movie/detail/:id", element: <DetailMovie />},
 
-      //Rutas de usuario
+      //rutas de usuariooooooooooooooooo
       { path: "users", element: <UserList /> },
-      { path: "users/:id", element: <UserDetail /> }
+      { path: "users/:id", element: <UserDetail /> },
+      //rutas de funkooooooooooooooooo
+      { path: "funkos", element: <FunkoList /> },
+      { path: "funkos/:id", element: <FunkoDetail /> },
     ]
   }
 ])
