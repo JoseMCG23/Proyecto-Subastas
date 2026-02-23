@@ -108,14 +108,7 @@ export default function FunkoList() {
                 </Table>
             </div>
 
-            {/*por si algna imagen no carga*/}
-            <p className="text-sm opacity-70 mt-3">
-                Si alguna imagen no aparece, probá abrirla directo así:
-                {" "}
-                <span className="underline">
-                    http://localhost:81/appmovie/api/uploads/NOMBRE.png
-                </span>
-            </p>
+           
         </div>
     );
 }
