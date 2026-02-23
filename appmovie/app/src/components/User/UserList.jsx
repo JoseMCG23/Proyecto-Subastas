@@ -46,7 +46,7 @@ export default function UserList() {
                             <TableHead>Nombre completo</TableHead>
                             <TableHead>Rol</TableHead>
                             <TableHead>Estado</TableHead>
-                            <TableHead>Acción</TableHead>
+                            <TableHead>Detalle Usuario</TableHead>
                         </TableRow>
                     </TableHeader>
 
@@ -63,7 +63,7 @@ export default function UserList() {
                                     <TableCell>
                                         {id ? (
                                             <Link className="underline" to={`/users/${id}`}>
-                                                Ver detalle
+                                                Ver Detalle
                                             </Link>
                                         ) : (
                                             <span className="opacity-60">Sin ID</span>
