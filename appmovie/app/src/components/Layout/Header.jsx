@@ -1,3 +1,4 @@
+import logo from "@/assets/logo.png";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -85,7 +86,7 @@ const userItems = [
           className="flex items-center gap-2 text-xl font-semibold tracking-wide hover:opacity-90 transition"
         >
           <Clapperboard className="h-6 w-6" />
-          <span className="hidden sm:inline">MoviesApp</span>
+          <span className="hidden sm:inline">FunkoPop</span>
         </Link>
 
         {/* -------- Menú escritorio -------- */}
@@ -94,7 +95,7 @@ const userItems = [
             {/* Películas */}
             <MenubarMenu>
               <MenubarTrigger className="text-white font-medium flex items-center gap-1 hover:text-secondary transition">
-                <Film className="h-4 w-4" /> Películas
+                <Film className="h-4 w-4" /> Funkos
                 <ChevronDown className="h-3 w-3" />
               </MenubarTrigger>
               <MenubarContent className="bg-primary/0 backdrop-blur-md border-white/10">

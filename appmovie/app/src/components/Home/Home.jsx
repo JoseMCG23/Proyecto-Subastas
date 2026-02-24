@@ -1,44 +1,31 @@
-import ticketImg from "../../assets/ticket.jpg";
 
 
 export function Home() {
   return (
-    <div className="relative w-full h-screen flex items-center justify-center text-center overflow-hidden">
-      {/* Fondo */}
-      <div
-        className="absolute inset-0 -z-10"
-        style={{
-          backgroundImage: `url(${ticketImg})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          filter: "brightness(0.5)",
-        }}
-      />
-
-      {/* Contenido principal */}
-      <div className="px-4 max-w-2xl text-white">
-        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-4 drop-shadow-lg">
-          Alquiler de Películas
+    <div className="w-full min-h-[calc(100vh-8rem)] flex items-center justify-center bg-white">
+      <div className="text-center px-4">
+        <h1 className="text-5xl font-extrabold text-black mb-4">
+          Subasta de Funko Pop
         </h1>
-        <p className="text-lg md:text-xl text-white/80 mb-6 drop-shadow">
-          Descubre y alquila tus películas favoritas por días.
+        <p className="text-black/70 mb-6">
+          Descubre y consigue tus funkos favoritos.
         </p>
+
         <div className="flex justify-center gap-4">
           <a
-            href="/movies"
-            className="px-6 py-3 bg-primary text-white rounded-lg font-semibold shadow-lg hover:bg-primary/90 transition"
+            href="/funkos"
+            className="px-6 py-3 bg-black text-white rounded-lg font-semibold hover:bg-neutral-800 transition"
           >
-            Ver Catálogo
-          </a> 
+            Ver Funkos
+          </a>
           <a
-            href="/user/login"
-            className="px-6 py-3 bg-secondary text-white rounded-lg font-semibold shadow-lg hover:bg-secondary/90 transition"
+            href="/users"
+            className="px-6 py-3 border border-black text-black rounded-lg font-semibold hover:bg-neutral-100 transition"
           >
-            Iniciar Sesión
+            Ver Usuarios
           </a>
         </div>
       </div>
-
     </div>
   );
 }
