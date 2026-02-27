@@ -7,16 +7,27 @@ class SubastaModel {
     }
 
     public function all(){
-        $sql = "SELECT s.idsubasta, f.nombre AS objeto, f.imagen_portada AS imagen, s.fechaInicio, s.fechafin, s.precioBase, s.estado
-                FROM subasta s INNER JOIN Funko f ON s.funko_id = f.idFunko ORDER BY s.idsubasta DESC;";
 
-        $r = $this->enlace->ExecuteSQL($sql);
-        if (!empty($r) && is_array($r)) {
-            for ($i = 0; $i < count($r); $i++) {
-                $r[$i]->cantidadPujas = $this->getCantidadPujas($r[$i]->idsubasta);
-            }
-        }
-        return $r;
+        $sql = "SELECT 
+                    s.idsubasta,
+                    f.nombre AS objeto,
+                    f.imagen_portada AS imagen,
+                    f.condicion,
+                    s.fechaInicio,
+                    s.fechafin,
+                    s.precioBase,
+                    s.estado,
+                    COUNT(DISTINCT p.idPuja) AS cantidadPujas,
+                    GROUP_CONCAT(DISTINCT c.nombre SEPARATOR ', ') AS categorias
+                FROM subasta s
+                INNER JOIN Funko f ON s.funko_id = f.idFunko
+                LEFT JOIN Puja p ON p.subastaId = s.idsubasta
+                LEFT JOIN funko_categoria fc ON fc.funko_id = f.idFunko
+                LEFT JOIN Categoria c ON c.idCategoria = fc.categoria_id
+                GROUP BY s.idsubasta
+                ORDER BY s.idsubasta DESC;";
+
+        return $this->enlace->ExecuteSQL($sql);
     }
     
     //Cantidad Pujas

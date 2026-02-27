@@ -37,10 +37,7 @@ export function SubastaList() {
                         />
 
                         <p className="text-sm mb-1">
-                            <strong>Categoría(s):</strong>{" "}
-                            {subasta.categorias && subasta.categorias.length > 0
-                                ? subasta.categorias.map(cat => cat.nombre).join(", ")
-                                : "Sin categoría"}
+                            <strong>Categoria:</strong> {subasta.categorias ? subasta.categorias : "Sin categoría"}
                         </p>
 
                         <p className="text-sm mb-1">
