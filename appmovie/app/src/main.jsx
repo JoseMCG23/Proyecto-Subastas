@@ -17,6 +17,11 @@ import UserDetail from "@/components/User/UserDetail";
 /////nuevo de cris de funko
 import FunkoList from "@/components/Funko/FunkoList";
 import FunkoDetail from "@/components/Funko/FunkoDetail";
+//import subasta
+import { SubastaList } from "@/components/subasta/SubastaList";
+import { SubastaDetail } from "@/components/subasta/SubastaDetail";
+//import historial de pujas
+import { HistorialPujas } from "@/components/pujas/HistorialPujas";
 const rutas = createBrowserRouter([
   {
     element: <Layout/>,
@@ -37,6 +42,11 @@ const rutas = createBrowserRouter([
       //rutas de funkooooooooooooooooo
       { path: "funkos", element: <FunkoList /> },
       { path: "funkos/:id", element: <FunkoDetail /> },
+      //Rutas Subastas
+      { path: "subastas", element: <SubastaList /> },
+      { path: "subastas/:id", element: <SubastaDetail /> },
+      //Ruta historial de pujas
+      { path: "subastas/:id/pujas", element: <HistorialPujas /> },
     ]
   }
 ])

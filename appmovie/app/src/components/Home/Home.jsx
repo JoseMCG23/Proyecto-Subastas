@@ -18,6 +18,14 @@ export function Home() {
           >
             Ver Funkos
           </a>
+
+          <a
+            href="/subastas"
+            className="px-6 py-3 bg-neutral-800 text-white rounded-lg font-semibold hover:bg-neutral-700 transition"
+          >
+            Ver Subastas
+          </a>
+
           <a
             href="/users"
             className="px-6 py-3 border border-black text-black rounded-lg font-semibold hover:bg-neutral-100 transition"
