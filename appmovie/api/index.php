@@ -19,7 +19,7 @@ require_once "controllers/core/Response.php";
 require_once "middleware/AuthMiddleware.php";
 
 /***--- Agregar todos los modelos*/
-require_once "models/ActorModel.php";
+
 require_once "models/RolModel.php";
 require_once "models/SubastaModel.php";
 require_once "models/PujaModel.php";
@@ -27,7 +27,7 @@ require_once "models/UsuarioModel.php";
 
 
 /***--- Agregar todos los controladores*/
-require_once "controllers/ActorController.php";
+
 require_once "controllers/usuario.php";
 require_once "models/FunkoCategoriaModel.php";
 require_once "models/FunkoImagenModel.php";

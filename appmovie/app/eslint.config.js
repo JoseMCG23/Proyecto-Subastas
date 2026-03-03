@@ -36,6 +36,9 @@ export default defineConfig({
     "react/react-in-jsx-scope": "off",
     "react/jsx-uses-react": "off",
 
+    // validación de PropTypes desactivada
+    "react/prop-types": "off",
+
     "no-unused-vars": [
       "error",
       { argsIgnorePattern: "^_" }

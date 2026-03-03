@@ -114,6 +114,30 @@ export default function FunkoDetail() {
                         </TableRow>
                     </TableBody>
                 </Table>
+
+                {/* historial, subastas donde ha participado el fukitouu */}
+                <div className="mt-6">
+                    <h3 className="text-lg font-semibold">Historial de subastas del objeto</h3>
+
+                    {Array.isArray(funko.subastas) && funko.subastas.length > 0 ? (
+                        <div className="mt-2 border rounded-md">
+                            <Table>
+                                <TableBody>
+                                    {funko.subastas.map((s) => (
+                                        <TableRow key={s.idsubasta}>
+                                            <TableCell className="font-medium">#{s.idsubasta}</TableCell>
+                                            <TableCell>Inicio: {s.fechaInicio ?? "-"}</TableCell>
+                                            <TableCell>Cierre: {s.fechafin ?? "-"}</TableCell>
+                                            <TableCell>Estado: {s.estado ?? "-"}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    ) : (
+                        <p className="mt-2 opacity-70">Este objeto aún no tiene subastas registradas.</p>
+                    )}
+                </div>
             </div>
         </div>
     );

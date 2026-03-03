@@ -4,12 +4,17 @@ import { Outlet } from "react-router-dom";
 
 export function Layout() {
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="min-h-screen bg-neutral-950 text-neutral-100">
+      { }
+      <div className="pointer-events-none fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-violet-900/25 via-neutral-950 to-neutral-950" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-fuchsia-900/10 via-transparent to-transparent" />
+      </div>
+
       <Header />
 
-      {}
-      <main className="flex-1 pt-20 pb-20 bg-white text-neutral-900">
-        <div className="max-w-7xl mx-auto px-6">
+      <main className="pt-20">
+        <div className="mx-auto max-w-7xl px-6 pb-16">
           <Outlet />
         </div>
       </main>
