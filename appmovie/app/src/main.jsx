@@ -52,6 +52,8 @@ const rutas = createBrowserRouter([
       { path: "catalogo/:id", element: <SubastaVista /> },
       //Ruta historial de pujas
       { path: "subastas/:id/pujas", element: <HistorialPujas /> },
+      //ruta catalogo
+      { path: "catalogo/:id/pujas", element: <HistorialPujas /> },
     ]
   }
 ])

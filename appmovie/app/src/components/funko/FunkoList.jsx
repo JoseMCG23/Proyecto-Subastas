@@ -1,114 +1,118 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import FunkoService from "@/services/FunkoService";
 
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
+// Ajustá si tu API sirve uploads así:
+const imgUrl = (name) =>
+    name ? `${import.meta.env.VITE_BASE_URL}uploads/${name}` : "";
+
+const chipBase =
+    "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-white/10";
 
 export default function FunkoList() {
-    const [data, setData] = useState([]);
-    const [error, setError] = useState("");
-
-    //ruta para imágenes (API/uploads)
-    // http://localhost:81/appmovie/api/uploads/MilesMorales.png
-    const uploadBaseUrl = import.meta.env.VITE_BASE_URL + "uploads/";
+    const [funkos, setFunkos] = useState([]);
+    const [q, setQ] = useState("");
 
     useEffect(() => {
         FunkoService.getFunkos()
-            .then((res) => {
-             
-                const payload = res.data?.data;
-
-                if (Array.isArray(payload)) setData(payload);
-                else {
-                    console.log("RESPUESTA FUNKO (NO ARRAY):", res.data);
-                    setData([]);
-                }
-            })
-            .catch((err) => setError(err.message));
+            .then((res) => setFunkos(Array.isArray(res.data) ? res.data : res.data?.data ?? []))
+            .catch(() => setFunkos([]));
     }, []);
 
-    if (error) return <div className="p-4">Error: {error}</div>;
+    const filtered = useMemo(() => {
+        const text = q.trim().toLowerCase();
+        if (!text) return funkos;
+        return funkos.filter((f) => {
+            const nombre = (f?.nombre ?? "").toLowerCase();
+            const cat = (f?.categoria ?? f?.categorias ?? "").toString().toLowerCase();
+            const dueno = (f?.dueno ?? f?.vendedor ?? f?.nombreVendedor ?? "").toString().toLowerCase();
+            return nombre.includes(text) || cat.includes(text) || dueno.includes(text);
+        });
+    }, [funkos, q]);
 
     return (
-        <div className="p-4">
-            <h2 className="text-xl font-bold mb-4">Listado de Objetos (Funkos)</h2>
+        <div className="mx-auto max-w-6xl px-4 pb-12 pt-6">
+            {/* Header */}
+            <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <h1 className="text-2xl font-bold tracking-tight text-white">Catálogo de Funkos</h1>
+                    <p className="mt-1 text-sm text-white/60">
+                        {filtered.length} objetos disponibles
+                    </p>
+                </div>
 
-            <div className="border rounded-md">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            {/* los 4 campos */}
-                            <TableHead>Imagen</TableHead>
-                            <TableHead>Nombre</TableHead>
-                            <TableHead>Categorías</TableHead>
-                            <TableHead>Dueño</TableHead>
-                        </TableRow>
-                    </TableHeader>
-
-                    <TableBody>
-                        {data.map((f, index) => {
-                            const id = f.idFunko ?? f.id ?? f.id_funko;
-
-                            // imagen_portada viene del api)
-                            const imgName = f.imagen_portada;
-                            const imgUrl = imgName ? `${uploadBaseUrl}${imgName}` : null;
-
-                            return (
-                                <TableRow key={id ?? index}>
-                                    {/*img principal */}
-                                    <TableCell>
-                                        {imgUrl ? (
-                                            <img
-                                                src={imgUrl}
-                                                alt={f.nombre}
-                                                className="h-12 w-12 object-cover rounded"
-                                                onError={(e) => {
-                                                    // si falla la imagen se oculta
-                                                    e.currentTarget.style.display = "none";
-                                                }}
-                                            />
-                                        ) : (
-                                            <span className="opacity-60">Sin imagen</span>
-                                        )}
-                                    </TableCell>
-
-                                    {/* nombre*/}
-                                    <TableCell>
-                                        {id ? (
-                                            <Link className="underline" to={`/funkos/${id}`}>
-                                                {f.nombre}
-                                            </Link>
-                                        ) : (
-                                            f.nombre
-                                        )}
-                                    </TableCell>
-
-                                    <TableCell>
-                                        {Array.isArray(f.categorias) ? f.categorias.join(", ") : "-"}
-                                    </TableCell>
-
-                                    <TableCell>{f.dueno ?? "-"}</TableCell>
-                                </TableRow>
-                            );
-                        })}
-
-                        {data.length === 0 && (
-                            <TableRow>
-                                <TableCell colSpan={4}>No hay funkos</TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
+                <div className="w-full sm:w-80">
+                    <input
+                        value={q}
+                        onChange={(e) => setQ(e.target.value)}
+                        placeholder="Buscar por nombre, categoría o dueño…"
+                        className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/40 outline-none ring-0 focus:border-violet-400/40"
+                    />
+                </div>
             </div>
 
-           
+            {/* Grid */}
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {filtered.map((f) => {
+                    const id = f?.idFunko ?? f?.id ?? f?.id_funko;
+                    const nombre = f?.nombre ?? "Sin nombre";
+                    const categoria = f?.categoria ?? (Array.isArray(f?.categorias) ? f.categorias.join(", ") : f?.categorias);
+                    const dueno = f?.dueno ?? f?.vendedor ?? f?.nombreVendedor;
+                    const portada = f?.imagen_portada ?? f?.imagenPortada ?? f?.portada;
+
+                    return (
+                        <Link
+                            key={id}
+                            to={`/funkos/${id}`}
+                            className="group overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-2xl shadow-violet-500/5 transition hover:-translate-y-0.5 hover:border-violet-400/30"
+                        >
+                            <div className="relative aspect-[4/3] w-full overflow-hidden bg-black/30">
+                                {portada ? (
+                                    <img
+                                        src={imgUrl(portada)}
+                                        alt={nombre}
+                                        className="h-full w-full object-contain transition duration-300 group-hover:scale-[1.03]"
+                                        onError={(e) => (e.currentTarget.style.opacity = 0.2)}
+                                    />
+                                ) : (
+                                    <div className="grid h-full w-full place-items-center text-sm text-white/40">
+                                        Sin imagen
+                                    </div>
+                                )}
+
+                                <div className="absolute left-3 top-3 flex gap-2">
+                                    {categoria ? (
+                                        <span className={`${chipBase} bg-violet-500/15 text-violet-200`}>
+                                            {String(categoria)}
+                                        </span>
+                                    ) : null}
+                                </div>
+                            </div>
+
+                            <div className="p-5">
+                                <h3 className="line-clamp-1 text-base font-semibold text-white">
+                                    {nombre}
+                                </h3>
+
+                                <div className="mt-3 flex items-center justify-between text-sm text-white/60">
+                                    <span className="line-clamp-1">
+                                        Dueño: <span className="text-white/80">{dueno ?? "—"}</span>
+                                    </span>
+                                    <span className="text-violet-300 group-hover:text-violet-200">
+                                        Ver detalle →
+                                    </span>
+                                </div>
+                            </div>
+                        </Link>
+                    );
+                })}
+            </div>
+
+            {filtered.length === 0 && (
+                <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-8 text-center text-white/60">
+                    No hay resultados con ese filtro.
+                </div>
+            )}
         </div>
     );
 }

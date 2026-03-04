@@ -31,20 +31,20 @@ import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // luego esto lo sacás de auth/context
+ 
   const userEmail = "Invitado";
 
-  // ✅ Ajustá href según tus rutas reales
+  
   const funkoItems = [
-    { title: "Catálogo", href: "/subastas", icon: <Boxes className="h-4 w-4" /> },
-    { title: "Ver Funkos", href: "/funko", icon: <Sparkles className="h-4 w-4" /> },
-    { title: "Filtrar", href: "/subastas?f=1", icon: <Filter className="h-4 w-4" /> },
+    { title: "Catálogo", href: "/catalogo", icon: <Boxes className="h-4 w-4" /> },
+    { title: "Ver Funkos", href: "/funkos", icon: <Sparkles className="h-4 w-4" /> },
+    { title: "Filtrar", href: "/catalogo", icon: <Filter className="h-4 w-4" /> },
   ];
 
   const mantItems = [
-    { title: "Usuarios", href: "/user", icon: <Wrench className="h-4 w-4" /> },
-    { title: "Funkos (CRUD)", href: "/funko/table", icon: <Wrench className="h-4 w-4" /> },
-    { title: "Subastas (CRUD)", href: "/subasta/table", icon: <Gavel className="h-4 w-4" /> },
+    { title: "Usuarios", href: "/users", icon: <Wrench className="h-4 w-4" /> },
+    { title: "Funkos", href: "/funkos", icon: <Wrench className="h-4 w-4" /> },
+    { title: "Subastas", href: "/subastas", icon: <Gavel className="h-4 w-4" /> },
   ];
 
   const userItems = [
@@ -56,7 +56,7 @@ export default function Header() {
   return (
     <header className="fixed top-0 left-0 z-50 w-full border-b border-white/10 bg-neutral-950/70 backdrop-blur-xl">
       <div className="mx-auto flex max-w-[1280px] items-center justify-between px-6 py-3 text-white">
-        {/* -------- Logo -------- */}
+        {/* -------- logo ------------------------------------------------------------------ */}
         <Link
           to="/"
           className="flex items-center gap-2 text-sm font-semibold tracking-wide hover:opacity-90 transition"
@@ -69,7 +69,7 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* -------- Menú escritorio -------- */}
+        {/* -------- menú  -------- ---------------------------------------------------------*/}
         <div className="hidden md:flex flex-1 justify-center">
           <Menubar className="w-auto bg-transparent border-none shadow-none gap-4">
             {/* Funkos */}
@@ -92,7 +92,7 @@ export default function Header() {
               </MenubarContent>
             </MenubarMenu>
 
-            {/* Mantenimientos */}
+            {/*mant */}
             <MenubarMenu>
               <MenubarTrigger className="text-white/80 font-medium flex items-center gap-2 hover:text-white transition data-[state=open]:text-white">
                 <Layers className="h-4 w-4" /> Mantenimientos
@@ -112,7 +112,7 @@ export default function Header() {
               </MenubarContent>
             </MenubarMenu>
 
-            {/* Usuario */}
+            {/*usuario */}
             <MenubarMenu>
               <MenubarTrigger className="text-white/80 font-medium flex items-center gap-2 hover:text-white transition data-[state=open]:text-white">
                 <User className="h-4 w-4" /> {userEmail}
@@ -134,7 +134,7 @@ export default function Header() {
           </Menubar>
         </div>
 
-        {/* -------- Carrito + Menú móvil -------- */}
+        {/* -------- carrito -------- */}
         <div className="flex items-center gap-3">
           <Link
             to="/cart"
@@ -149,7 +149,7 @@ export default function Header() {
             </Badge>
           </Link>
 
-          {/* Menú móvil */}
+          {/* Menú */}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
               <button className="md:hidden grid h-10 w-10 place-items-center rounded-full bg-white/5 ring-1 ring-white/10 hover:bg-white/10 transition">
