@@ -1,4 +1,4 @@
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo2.webp";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -61,12 +61,11 @@ export default function Header() {
           to="/"
           className="flex items-center gap-2 text-sm font-semibold tracking-wide hover:opacity-90 transition"
         >
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-violet-500/15 ring-1 ring-white/10">
-            <img src={logo} alt="SubastasFunko" className="h-6 w-6 object-contain" />
-          </span>
-          <span className="hidden sm:inline">
-            Subastas<span className="text-violet-300">Funko</span>
-          </span>
+          <img
+            src={logo}
+            alt="SubastasFunko"
+            className="h-14 w-auto object-contain"//// para aumentar el tamaño del logo  
+          />
         </Link>
 
         {/* -------- menú  -------- ---------------------------------------------------------*/}
