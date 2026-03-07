@@ -38,24 +38,24 @@ export function Home() {
             </h1>
 
             <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/75 md:text-base">
-              El marketplace donde coleccionistas compiten por las piezas
+              El marketplace donde coleccionistas compiten por las figuras
             </p>
             <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/75 md:text-base">
                más codiciadas.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
-                to="/catalogo"
+                to="/subastas"
                 className="rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 hover:opacity-95 transition"
               >
-                Pujar ahora →
+                Ver Subastas →
               </Link>
 
               <Link
-                to="/catalogo"
+                to="/funkos"
                 className="rounded-full bg-white/10 px-6 py-3 text-sm font-semibold text-white/90 ring-1 ring-white/15 hover:bg-white/15 transition"
               >
-                Explorar catálogo
+                Ver Funko Pops →
               </Link>
             </div>
           </div>

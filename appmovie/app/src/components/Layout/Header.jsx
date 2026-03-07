@@ -36,9 +36,9 @@ export default function Header() {
 
   
   const funkoItems = [
-    { title: "Catálogo", href: "/catalogo", icon: <Boxes className="h-4 w-4" /> },
+    { title: "Catálogo", href: "/subastas", icon: <Boxes className="h-4 w-4" /> },
     { title: "Ver Funkos", href: "/funkos", icon: <Sparkles className="h-4 w-4" /> },
-    { title: "Filtrar", href: "/catalogo", icon: <Filter className="h-4 w-4" /> },
+    { title: "Filtrar", href: "/subastas", icon: <Filter className="h-4 w-4" /> },
   ];
 
   const mantItems = [

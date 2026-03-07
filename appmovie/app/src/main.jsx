@@ -18,11 +18,9 @@ import UserDetail from "@/components/User/UserDetail";
 import FunkoList from "@/components/Funko/FunkoList";
 import FunkoDetail from "@/components/Funko/FunkoDetail";
 //import subasta
-import { SubastaList } from "@/components/subasta/SubastaList";
-import { SubastaDetail } from "@/components/subasta/SubastaDetail";
 import { SubastaCatalogo } from "@/components/subasta/SubastaCatalogo";
 import { SubastaVista } from "@/components/subasta/SubastaVista";
-//import historial de pujas sapo jose rata maria de los angeles 
+//import historial de pujas 
 import { HistorialPujas } from "@/components/pujas/HistorialPujas";
 const rutas = createBrowserRouter([
   {
@@ -45,15 +43,10 @@ const rutas = createBrowserRouter([
       { path: "funkos", element: <FunkoList /> },
       { path: "funkos/:id", element: <FunkoDetail /> },
       //Rutas Subastas
-      { path: "subastas", element: <SubastaList /> },
-      { path: "subastas/:id", element: <SubastaDetail /> },
-
-      { path: "catalogo", element: <SubastaCatalogo /> },
-      { path: "catalogo/:id", element: <SubastaVista /> },
+      { path: "subastas", element: <SubastaCatalogo /> },
+      { path: "subastas/:id", element: <SubastaVista /> },
       //Ruta historial de pujas
       { path: "subastas/:id/pujas", element: <HistorialPujas /> },
-      //ruta catalogo
-      { path: "catalogo/:id/pujas", element: <HistorialPujas /> },
     ]
   }
 ])

@@ -66,12 +66,12 @@ export default function FunkoList() {
                             to={`/funkos/${id}`}
                             className="group overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-2xl shadow-violet-500/5 transition hover:-translate-y-0.5 hover:border-violet-400/30"
                         >
-                            <div className="relative aspect-[4/3] w-full overflow-hidden bg-black/30">
+                            <div className="relative aspect-square w-full overflow-hidden bg-black/30">
                                 {portada ? (
                                     <img
                                         src={imgUrl(portada)}
                                         alt={nombre}
-                                        className="h-full w-full object-contain transition duration-300 group-hover:scale-[1.03]"
+                                        className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
                                         onError={(e) => (e.currentTarget.style.opacity = 0.2)}
                                     />
                                 ) : (
