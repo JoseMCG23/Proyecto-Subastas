@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import FunkoService from "@/services/FunkoService";
 
-// Ajustá si tu API sirve uploads así:
+
 const imgUrl = (name) =>
     name ? `${import.meta.env.VITE_BASE_URL}uploads/${name}` : "";
 

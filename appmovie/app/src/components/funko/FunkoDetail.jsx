@@ -33,7 +33,7 @@ export default function FunkoDetail() {
         return [...(portada ? [portada] : []), ...extraUrls];
     }, [funko, portada, uploadBaseUrl]);
 
-    // ✅ Dueño “a prueba” (por si el backend manda distintos nombres)
+    // dueño por si se manda distintos nombres
     const dueno = useMemo(() => {
         if (!funko) return "—";
         return (
@@ -47,7 +47,7 @@ export default function FunkoDetail() {
         );
     }, [funko]);
 
-    // ✅ Historial: a veces viene como subastas[], a veces como subastaActiva
+    // historial
     const historial = useMemo(() => {
         if (!funko) return [];
         const arr = Array.isArray(funko.subastas) ? funko.subastas : [];
@@ -114,7 +114,7 @@ export default function FunkoDetail() {
                     )}
                 </div>
 
-                {/* Info */}
+                {/* información */}
                 <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
                     <div className="flex flex-wrap items-center gap-2 text-xs text-white/80">
                         {categoria && (
@@ -147,7 +147,7 @@ export default function FunkoDetail() {
                 </div>
             </div>
 
-            {/* Historial */}
+            {/* historial */}
             <div className="mt-6 rounded-3xl border border-white/10 bg-white/5 p-6">
                 <h3 className="text-lg font-semibold">Historial de subastas del objeto</h3>
                 <p className="mt-1 text-sm text-white/60">ID, inicio, cierre y estado.</p>

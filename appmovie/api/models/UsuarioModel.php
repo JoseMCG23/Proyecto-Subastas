@@ -73,9 +73,8 @@ class UsuarioModel
             //rol
             $u->rol = $rolM->getNombreRol($u->rol_id);
 
-            // =========================
-            // CAMPOS CALCULADOS
-            // =========================
+            // CAMPOS CALCULADOSSSS
+            
 
             //cant  subastas creadas
             $sqlSubastas = "SELECT COUNT(*) as cantidad
@@ -106,5 +105,3 @@ class UsuarioModel
     }
 }
 
-///caca
-//cacaaaaaaaaaaaaaa

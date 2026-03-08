@@ -5,7 +5,7 @@ export function Footer() {
         <div>
           <p className="text-sm font-semibold">SubastasFunko</p>
           <p className="mt-2 text-sm text-white/60">
-            Marketplace premium de subastas de Funko Pop para coleccionistas.
+            Marketplace de subastas de Funko Pop para coleccionistas.
           </p>
           <p className="mt-4 text-xs text-white/40">© {new Date().getFullYear()} ISW-613</p>
         </div>
