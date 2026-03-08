@@ -7,15 +7,10 @@ const API_UPLOADS = "http://localhost:81/appmovie/api/uploads";
 export function SubastaVista() {
     const { id } = useParams();
     const [subasta, setSubasta] = useState(null);
-    const [pujas, setPujas] = useState([]);
 
     useEffect(() => {
         SubastaService.getSubastaById(id)
             .then((r) => setSubasta(r.data.data))
-            .catch(console.error);
-
-        SubastaService.getPujasBySubasta(id)
-            .then((r) => setPujas(r.data.data || []))
             .catch(console.error);
     }, [id]);
 
@@ -33,10 +28,6 @@ export function SubastaVista() {
     const imgSrc = imgName
         ? `${API_UPLOADS}/${imgName}`
         : "";
-
-    const topMonto = pujas.length
-        ? Math.max(...pujas.map((p) => Number(p.monto)))
-        : Number(subasta.precioBase || 0);
 
     const estado = subasta.estado;
 
@@ -68,11 +59,21 @@ export function SubastaVista() {
                         </p> 
 
                         <h1 className="text-3xl font-extrabold">{nombre}</h1>
+                        {/* categoría y condición */}
+                        <p className="text-sm text-white/60">
+                            {(() => {
+                                const cats = Array.isArray(subasta.categorias)
+                                    ? subasta.categorias.map(c => c.nombre).join(', ')
+                                    : subasta.categorias || '—';
+                                const cond = subasta.condicion || '—';
+                                return `${cats} · ${cond}`;
+                            })()}
+                        </p>
 
                         <div className="rounded-xl bg-black/20 p-4 border border-white/10">
-                            <p className="text-xs text-white/60">Puja actual</p>
+                            <p className="text-xs text-white/60">Precio base</p>
                             <p className="text-3xl font-extrabold text-emerald-300">
-                                ₡{topMonto.toLocaleString("es-CR")}
+                                ₡{Number(subasta.precioBase || 0).toLocaleString("es-CR")}
                             </p>
                         </div>
 
@@ -80,7 +81,7 @@ export function SubastaVista() {
                             to={`/subastas/${id}/pujas`}
                             className="block w-full text-center rounded-2xl bg-linear-to-r from-violet-500 to-fuchsia-500 py-3 text-sm font-semibold text-white hover:from-violet-600 hover:to-fuchsia-600 transition"
                         >
-                            PUJAR AHORA
+                            HISTORIAL DE PUJAS
                         </Link>
                     </div>
 
@@ -100,9 +101,27 @@ export function SubastaVista() {
                                 {subasta.fechafin}
                             </p>
                         </div>
+                        {/* Información adicional */}
+                        <div className="bg-white/5 rounded-xl p-3 border border-white/10">
+                            <p className="text-xs text-white/60 mb-1">Incremento mínimo</p>
+                            <p className="text-3xl font-extrabold text-white">
+                                ₡{Number(subasta.incre_minimo || 0).toLocaleString("es-CR")}
+                            </p>
+                        </div>
+                        <div className="bg-white/5 rounded-xl p-3 border border-white/10">
+                            <p className="text-xs text-white/60 mb-1">Estado</p>
+                            <p className="text-3xl font-extrabold text-white">
+                                {estado}
+                            </p>
+                        </div>
+                        <div className="bg-white/5 rounded-xl p-3 border border-white/10">
+                            <p className="text-xs text-white/60 mb-1">Total de pujas</p>
+                            <p className="text-3xl font-extrabold text-white">
+                                {subasta.cantidadTotalPujas ?? 0}
+                            </p>
+                        </div>
                     </div>
 
-                    {/* Botón Volver */}
                     <Link
                         to="/subastas"
                         className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 px-4 py-2.5 text-sm text-white/80 hover:text-white transition mt-6 pt-4 w-full"
@@ -112,33 +131,7 @@ export function SubastaVista() {
                 </div>
             </div>
 
-            {/* Historial */}
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-                <h2 className="text-lg font-semibold">
-                    Historial de pujas
-                </h2>
-
-                <div className="mt-4 space-y-3">
-                    {pujas.map((p, i) => (
-                        <div
-                            key={i}
-                            className="flex justify-between items-center rounded-xl border border-white/10 bg-black/20 px-4 py-3"
-                        >
-                            <div>
-                                <p className="text-sm font-semibold">
-                                    {p.usuario}
-                                </p>
-                                <p className="text-xs text-white/50">
-                                    {p.fechaYhora}
-                                </p>
-                            </div>
-                            <p className="text-sm font-extrabold text-emerald-300">
-                                ₡{Number(p.monto).toLocaleString("es-CR")}
-                            </p>
-                        </div>
-                    ))}
-                </div>
-            </div>
+            
         </div>
     );
 }

@@ -16,6 +16,7 @@ class SubastaModel {
                     s.fechaInicio,
                     s.fechafin,
                     s.precioBase,
+                    s.incre_minimo,
                     s.estado,
                     COUNT(DISTINCT p.idPuja) AS cantidadPujas,
                     GROUP_CONCAT(DISTINCT c.nombre SEPARATOR ', ') AS categorias
