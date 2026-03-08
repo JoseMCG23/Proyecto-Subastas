@@ -34,7 +34,6 @@ export function SubastaVista() {
     return (
         <div className="space-y-8">
             <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-                {/* Imagen */}
                 <div className="rounded-3xl border border-white/10 bg-white/5 overflow-hidden">
                     <div className="aspect-4/3 bg-black/20 grid place-items-center">
                         {imgSrc ? (
@@ -51,7 +50,6 @@ export function SubastaVista() {
                     </div>
                 </div>
 
-                {/* Panel puja */}
                 <div className="rounded-3xl border border-white/10 bg-white/5 p-6 flex flex-col">
                     <div className="space-y-4">
                         <p className="text-xs text-violet-200 font-semibold">
@@ -59,7 +57,6 @@ export function SubastaVista() {
                         </p> 
 
                         <h1 className="text-3xl font-extrabold">{nombre}</h1>
-                        {/* categoría y condición */}
                         <p className="text-sm text-white/60">
                             {(() => {
                                 const cats = Array.isArray(subasta.categorias)
@@ -85,7 +82,6 @@ export function SubastaVista() {
                         </Link>
                     </div>
 
-                    {/* Fechas */}
                     <div className="space-y-3 mt-6 pt-4 border-t border-white/10 grow">
                         <div className="bg-white/5 rounded-xl p-3 border border-white/10">
                             <p className="text-xs text-white/60 mb-1">Fecha de Inicio</p>
@@ -101,7 +97,7 @@ export function SubastaVista() {
                                 {subasta.fechafin}
                             </p>
                         </div>
-                        {/* Información adicional */}
+
                         <div className="bg-white/5 rounded-xl p-3 border border-white/10">
                             <p className="text-xs text-white/60 mb-1">Incremento mínimo</p>
                             <p className="text-3xl font-extrabold text-white">
