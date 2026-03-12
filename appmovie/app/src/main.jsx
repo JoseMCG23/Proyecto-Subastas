@@ -11,9 +11,18 @@ import { PageNotFound } from './components/Home/PageNotFound'
 import TableMovies from './components/Movie/TableMovies'
 import { ListMovies } from './components/Movie/ListMovies'
 import { DetailMovie } from './components/Movie/DetailMovie'
-/////nuevo de cris de usaurio
+/////nuevo de cris de usuario
 import UserList from "@/components/User/UserList";
 import UserDetail from "@/components/User/UserDetail";
+
+
+
+//nuevo actualizar usuario
+import UserUpdate from "@/components/User/UserUpdate";
+
+
+
+
 /////nuevo de cris de funko
 import FunkoList from "@/components/Funko/FunkoList";
 import FunkoDetail from "@/components/Funko/FunkoDetail";
@@ -22,6 +31,7 @@ import { SubastaCatalogo } from "@/components/subasta/SubastaCatalogo";
 import { SubastaVista } from "@/components/subasta/SubastaVista";
 //import historial de pujas 
 import { HistorialPujas } from "@/components/pujas/HistorialPujas";
+
 const rutas = createBrowserRouter([
   {
     element: <Layout/>,
@@ -39,9 +49,12 @@ const rutas = createBrowserRouter([
       //rutas de usuariooooooooooooooooo
       { path: "users", element: <UserList /> },
       { path: "users/:id", element: <UserDetail /> },
+      { path: "users/update/:id", element: <UserUpdate /> },
       //rutas de funkooooooooooooooooo
       { path: "funkos", element: <FunkoList /> },
       { path: "funkos/:id", element: <FunkoDetail /> },
+    //Rutas actualizar usuario
+   
       //Rutas Subastas
       { path: "subastas", element: <SubastaCatalogo /> },
       { path: "subastas/:id", element: <SubastaVista /> },

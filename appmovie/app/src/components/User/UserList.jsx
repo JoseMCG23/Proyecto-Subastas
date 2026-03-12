@@ -74,7 +74,6 @@ export default function UserList() {
 
     return (
         <div className="mx-auto w-full max-w-6xl px-4 pb-10 pt-6">
-            {/* Header */}
             <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                     <p className="text-xs font-semibold text-violet-300/90">INFO</p>
@@ -86,7 +85,6 @@ export default function UserList() {
                     </p>
                 </div>
 
-                {/* Search */}
                 <div className="relative w-full sm:w-[340px]">
                     <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
                     <input
@@ -98,7 +96,6 @@ export default function UserList() {
                 </div>
             </div>
 
-            {/* Card Table */}
             <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 shadow-2xl shadow-violet-500/10">
                 <div className="border-b border-white/10 px-4 py-3">
                     <p className="text-sm font-semibold text-white/90">
@@ -113,7 +110,7 @@ export default function UserList() {
                                 <TableHead className="text-white/60">Nombre</TableHead>
                                 <TableHead className="text-white/60">Rol</TableHead>
                                 <TableHead className="text-white/60">Estado</TableHead>
-                                
+                                <TableHead className="text-white/60">Acciones</TableHead>
                             </TableRow>
                         </TableHeader>
 
@@ -121,7 +118,7 @@ export default function UserList() {
                             {filtered.map((u, index) => {
                                 const id = u.idUsuario ?? u.id ?? u.id_usuario;
                                 const nombre = u.nombreCompleto ?? "-";
-
+                            
                                 return (
                                     <TableRow
                                         key={id ?? index}
@@ -154,7 +151,19 @@ export default function UserList() {
                                             <StatusPill value={u.estado} />
                                         </TableCell>
 
-                                        
+                                        <TableCell>
+                                            <div className="flex items-center gap-3">
+                                                
+
+                                                <Link
+                                                    to={`/users/update/${id}`}
+                                                    state={{ usuario: u }}
+                                                    className="text-sm font-medium text-violet-300 hover:text-violet-200 transition"
+                                                >
+                                                    Editar
+                                                </Link>
+                                            </div>
+                                        </TableCell>
                                     </TableRow>
                                 );
                             })}
