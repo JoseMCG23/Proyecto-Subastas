@@ -21,14 +21,16 @@ class UsuarioService {
 
 
     /// actualizar usuario
-    updateUsuario(Usuario) {
+    // Actualizar usuario
+    updateUsuario(usuario) {
         return axios({
             method: "put",
             url: BASE_URL,
-            data: JSON.stringify(Usuario)
+            data: JSON.stringify(usuario),
         });
     }
 }
+
 
 
 

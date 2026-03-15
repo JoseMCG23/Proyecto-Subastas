@@ -51,15 +51,16 @@ class UsuarioModel
     /**
      * Detalle usuario
      * incluye: nombre completo, rol, estado, fecha registro
-     * campos calculados: cantidad subastas creadas, esta queda pendienteeeeeeeee
+     * campos calculados: cantidad subastas creadas y pujas
      */
-    public function get($id)
+    public function get($id)   
     {
         $rolM = new RolModel();
 
-        $vSql = "SELECT id, nombre, apellido, estado, fechaRegistro, rol_id
-             FROM Usuario
-             WHERE id=$id;";
+        //cambio del tercer adelanto, agrego correo
+        $vSql = "SELECT id, nombre, apellido, correo, estado, fechaRegistro, rol_id
+         FROM Usuario
+         WHERE id=$id;";
 
         $vResultado = $this->enlace->executeSQL($vSql);
 
@@ -103,5 +104,29 @@ class UsuarioModel
 
         return null;
     }
+
+
+    public function update($objeto)
+    {
+        //separo nombre completo
+        $nombreCompleto = trim($objeto->nombreCompleto);
+        $partes = explode(" ", $nombreCompleto, 2);
+
+        $nombre = $partes[0];
+        $apellido = isset($partes[1]) ? $partes[1] : "";
+
+        //consulta sql
+        $sql = "Update Usuario SET nombre ='$nombre'," .
+            "apellido ='$apellido'," .
+            "correo ='$objeto->correo' " .
+            "Where id=$objeto->id";
+
+        
+        $cResults = $this->enlace->executeSQL_DML($sql);
+
+        
+        return $this->get($objeto->id);
+    }
+
 }
 
