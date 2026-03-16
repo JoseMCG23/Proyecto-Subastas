@@ -1,5 +1,5 @@
 // FORZAR MODO CLARO
-document.documentElement.classList.remove("dark");
+//document.documentElement.classList.remove("dark");
 
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -25,7 +25,9 @@ import UserUpdate from "@/components/User/UserUpdate";
 
 /////nuevo de cris de funko
 import FunkoList from "@/components/Funko/FunkoList";
+import FunkoCreate from "@/components/Funko/FunkoCreate";
 import FunkoDetail from "@/components/Funko/FunkoDetail";
+
 //import subasta
 import { SubastaCatalogo } from "@/components/subasta/SubastaCatalogo";
 import { SubastaVista } from "@/components/subasta/SubastaVista";
@@ -50,9 +52,12 @@ const rutas = createBrowserRouter([
       { path: "users", element: <UserList /> },
       { path: "users/:id", element: <UserDetail /> },
       { path: "users/update/:id", element: <UserUpdate /> },
+   
       //rutas de funkooooooooooooooooo
       { path: "funkos", element: <FunkoList /> },
+      { path: "funkos/create", element: <FunkoCreate /> },
       { path: "funkos/:id", element: <FunkoDetail /> },
+     
     //Rutas actualizar usuario
    
       //Rutas Subastas

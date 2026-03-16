@@ -1,13 +1,12 @@
 <?php
-// localhost:81/appmovie/api/funko
-class funko
+class categoria
 {
-
+    // GET /appmovie/api/categoria
     public function index()
     {
         try {
             $response = new Response();
-            $m = new FunkoModel();
+            $m = new FunkoCategoriaModel();
             $result = $m->all();
             $response->toJSON($result);
         } catch (Exception $e) {
@@ -15,12 +14,12 @@ class funko
         }
     }
 
-    // localhost:81/appmovie/api/funko/1
+    // GET /appmovie/api/categoria/1
     public function get($id)
     {
         try {
             $response = new Response();
-            $m = new FunkoModel();
+            $m = new FunkoCategoriaModel();
             $result = $m->get($id);
             $response->toJSON($result);
         } catch (Exception $e) {
@@ -28,24 +27,15 @@ class funko
         }
     }
 
-
-    //POST Crear
-    public function create()
+    public function getCategoriaFunkos($idCategoria)
     {
         try {
-            $request = new Request();
             $response = new Response();
-            //Obtener json enviado
-            $inputJSON = $request->getJSON();
-            //Instancia del modelo
-            $funko = new FunkoModel();
-            //Acción del modelo a ejecutar
-            $result = $funko->create($inputJSON);
-            //Dar respuesta
+            $m = new FunkoCategoriaModel();
+            $result = $m->getCategoriasFunko($idCategoria);
             $response->toJSON($result);
         } catch (Exception $e) {
-            $response->toJSON($result);
             handleException($e);
         }
-    } 
+    }
 }

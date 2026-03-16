@@ -13,6 +13,14 @@ class FunkoService {
     getFunkoById(idFunko) {
         return axios.get(BASE_URL + "/" + idFunko);
     }
+
+// Crear
+    createFunko(funko) {
+        return axios.post(BASE_URL, JSON.stringify(funko));
+    }
+
+
+
 }
 
 export default new FunkoService();

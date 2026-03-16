@@ -17,8 +17,9 @@ class FunkoModel
         return null;
     }
 
+
     /**
-     * LISTADOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+     * LISTADO
      * nombre, imagen_portada, categorias, dueno
      */
     public function all()
@@ -43,7 +44,7 @@ class FunkoModel
     }
 
     /**
-     * DETALLEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+     * DETALLE
      */
     public function get($id)
     {
@@ -74,5 +75,46 @@ class FunkoModel
             return $f;
         }
         return null;
+    }
+
+    /**
+     * Crear funko
+     * @param $objeto funko a insertar
+     * @return $this->get($idFunko) - Objeto funko
+     */
+    //
+    public function create($objeto)
+    {
+        //Primera imagen como portada
+        $imagenPortada = $objeto->imagenes[0];
+
+        //Consulta sql
+        //Identificador autoincrementable
+        $sql = "Insert into Funko (nombre, descripcion, condicion, estado, vendedor_id, imagen_portada)" .
+            " Values ('$objeto->nombre','$objeto->descripcion',
+                '$objeto->condicion','$objeto->estado',$objeto->vendedor_id,'$imagenPortada')";
+
+        //Ejecutar la consulta
+        //Obtener ultimo insert
+        $idFunko = $this->enlace->executeSQL_DML_last($sql);
+
+        //--- Categorias ---
+        //Crear elementos a insertar en categorias
+        foreach ($objeto->categorias as $value) {
+            $sql = "Insert into Funko_Categoria(funko_id,categoria_id)" .
+                " Values($idFunko,$value)";
+            $vResultadoCat = $this->enlace->executeSQL_DML($sql);
+        }
+
+        //--- Imagenes ---
+        //Crear elementos a insertar en imagenes
+        foreach ($objeto->imagenes as $item) {
+            $sql = "Insert into Funko_Imagen(funko_id,urlImagen)" .
+                " Values($idFunko,'$item')";
+            $vResultadoImg = $this->enlace->executeSQL_DML($sql);
+        }
+
+        //Retornar funko
+        return $this->get($idFunko);
     }
 }

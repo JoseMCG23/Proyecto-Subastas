@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import FunkoService from "@/services/FunkoService";
-
 
 const imgUrl = (name) =>
     name ? `${import.meta.env.VITE_BASE_URL}uploads/${name}` : "";
@@ -32,7 +33,6 @@ export default function FunkoList() {
 
     return (
         <div className="mx-auto max-w-6xl px-4 pb-12 pt-6">
-            {/* Header */}
             <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight text-white">Catálogo de Funkos</h1>
@@ -41,17 +41,25 @@ export default function FunkoList() {
                     </p>
                 </div>
 
-                <div className="w-full sm:w-80">
-                    <input
-                        value={q}
-                        onChange={(e) => setQ(e.target.value)}
-                        placeholder="Buscar por nombre, categoría o dueño…"
-                        className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/40 outline-none ring-0 focus:border-violet-400/40"
-                    />
+                <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
+                    <div className="w-full sm:w-80">
+                        <input
+                            value={q}
+                            onChange={(e) => setQ(e.target.value)}
+                            placeholder="Buscar por nombre, categoría o dueño…"
+                            className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/40 outline-none ring-0 focus:border-violet-400/40"
+                        />
+                    </div>
+
+                    <Link to="/funkos/create">
+                        <Button className="flex items-center gap-2">
+                            <Plus className="h-4 w-4" />
+                            Nuevo Funko
+                        </Button>
+                    </Link>
                 </div>
             </div>
 
-            {/* Grid */}
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {filtered.map((f) => {
                     const id = f?.idFunko ?? f?.id ?? f?.id_funko;

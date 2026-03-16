@@ -28,6 +28,10 @@ import {
 } from "@/components/ui/menubar";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 
+
+
+
+
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -60,11 +64,11 @@ export default function Header() {
         <Link
           to="/"
           className="flex items-center gap-2 text-sm font-semibold tracking-wide hover:opacity-90 transition"
-        >
+        >{/* para aumentar el tamaño del logo */}
           <img
             src={logo}
             alt="SubastasFunko"
-            className="h-14 w-auto object-contain"//// para aumentar el tamaño del logo  
+            className="h-14 w-auto object-contain"
           />
         </Link>
 
@@ -97,6 +101,7 @@ export default function Header() {
                 <Layers className="h-4 w-4" /> Mantenimientos
                 <ChevronDown className="h-3 w-3 opacity-70" />
               </MenubarTrigger>
+
               <MenubarContent className="bg-neutral-950/95 backdrop-blur-md border-white/10 text-white">
                 {mantItems.map((item) => (
                   <MenubarItem key={item.href} asChild>

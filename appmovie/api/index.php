@@ -24,18 +24,19 @@ require_once "models/RolModel.php";
 require_once "models/SubastaModel.php";
 require_once "models/PujaModel.php";
 require_once "models/UsuarioModel.php";
-
+require_once "models/imageModel.php";
+require_once "models/FunkoModel.php";
+require_once "models/FunkoImagenModel.php";
+require_once "models/FunkoCategoriaModel.php";
 
 /***--- Agregar todos los controladores*/
 
 require_once "controllers/usuario.php";
-require_once "models/FunkoCategoriaModel.php";
-require_once "models/FunkoImagenModel.php";
-require_once "models/FunkoModel.php";
 require_once "controllers/funko.php";
 require_once "controllers/subasta.php";
 require_once "controllers/puja.php";
-
+require_once 'controllers/categoria.php';
+require_once "controllers/image.php";
 //Enrutador
 require_once "routes/RoutesController.php";
 $index = new RoutesController();
