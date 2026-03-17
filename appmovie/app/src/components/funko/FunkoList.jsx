@@ -69,9 +69,8 @@ export default function FunkoList() {
                     const portada = f?.imagen_portada ?? f?.imagenPortada ?? f?.portada;
 
                     return (
-                        <Link
+                        <div
                             key={id}
-                            to={`/funkos/${id}`}
                             className="group overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-2xl shadow-violet-500/5 transition hover:-translate-y-0.5 hover:border-violet-400/30"
                         >
                             <div className="relative aspect-square w-full overflow-hidden bg-black/30">
@@ -106,12 +105,25 @@ export default function FunkoList() {
                                     <span className="line-clamp-1">
                                         Dueño: <span className="text-white/80">{dueno ?? "—"}</span>
                                     </span>
-                                    <span className="text-violet-300 group-hover:text-violet-200">
-                                        Ver detalle →
-                                    </span>
+
+                                    <div className="flex items-center gap-3">
+                                        <Link
+                                            to={`/funkos/update/${id}`}
+                                            className="text-amber-300 hover:text-amber-200"
+                                        >
+                                            Editar
+                                        </Link>
+
+                                        <Link
+                                            to={`/funkos/${id}`}
+                                            className="text-violet-300 hover:text-violet-200"
+                                        >
+                                            Ver detalle →
+                                        </Link>
+                                    </div>
                                 </div>
                             </div>
-                        </Link>
+                        </div>
                     );
                 })}
             </div>

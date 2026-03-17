@@ -47,5 +47,24 @@ class funko
             $response->toJSON($result);
             handleException($e);
         }
-    } 
+    }
+
+    // PUT Actualizar
+    public function update()
+    {
+        try {
+            $request = new Request();
+            $response = new Response();
+            $inputJSON = $request->getJSON();
+
+            $funko = new FunkoModel();
+            $result = $funko->update($inputJSON);
+
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+
+    
 }

@@ -117,4 +117,77 @@ class FunkoModel
         //Retornar funko
         return $this->get($idFunko);
     }
+
+    /**
+     * Verifica si el funko tiene una subasta activa
+     */
+    private function tieneSubastaActiva($idFunko)
+    {
+        $sql = "SELECT idsubasta
+            FROM subasta
+            WHERE funko_id = $idFunko
+              AND LOWER(estado) = 'activa';";
+        $r = $this->enlace->executeSQL($sql);
+        return (!empty($r));
+    }
+
+    /**
+     * Actualizar funko
+     * @param $objeto funko a actualizar
+     * @return $this->get($idFunko) - Objeto funko
+     */
+    public function update($objeto)
+    {
+        $idFunko = $objeto->idFunko;
+
+        // Regla
+        // solo se puede editar si NO está en subasta activa
+        if ($this->tieneSubastaActiva($idFunko)) {
+            throw new Exception("No se puede editar el funko porque tiene una subasta activa");
+        }
+
+        // Primera imagen como portada
+        $imagenPortada = $objeto->imagenes[0];
+
+        // Actualizar tabla principal
+        $sql = "UPDATE Funko SET
+                nombre = '$objeto->nombre',
+                descripcion = '$objeto->descripcion',
+                condicion = '$objeto->condicion',
+                estado = '$objeto->estado',
+                imagen_portada = '$imagenPortada'
+            WHERE idFunko = $idFunko";
+
+        $this->enlace->executeSQL_DML($sql);
+
+        // --- Categorias ---
+        // Eliminar categorias actuales
+        $sql = "DELETE FROM Funko_Categoria WHERE funko_id = $idFunko";
+        $this->enlace->executeSQL_DML($sql);
+
+        // Insertar categorias nuevas
+        foreach ($objeto->categorias as $value) {
+            $sql = "INSERT INTO Funko_Categoria(funko_id, categoria_id)
+                VALUES($idFunko, $value)";
+            $this->enlace->executeSQL_DML($sql);
+        }
+
+        // --- Imagenes ---
+        // Eliminar imagenes actuales
+        $sql = "DELETE FROM Funko_Imagen WHERE funko_id = $idFunko";
+        $this->enlace->executeSQL_DML($sql);
+
+        // Insertar imagenes nuevas
+        foreach ($objeto->imagenes as $item) {
+            $sql = "INSERT INTO Funko_Imagen(funko_id, urlImagen)
+                VALUES($idFunko, '$item')";
+            $this->enlace->executeSQL_DML($sql);
+        }
+
+        // Retornar funko actualizado
+        return $this->get($idFunko);
+    }
+
+
+    
 }

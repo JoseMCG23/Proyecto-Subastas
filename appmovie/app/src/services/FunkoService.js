@@ -18,8 +18,10 @@ class FunkoService {
     createFunko(funko) {
         return axios.post(BASE_URL, JSON.stringify(funko));
     }
-
-
+// Actualizar
+    updateFunko(funko) {
+        return axios.put(BASE_URL, JSON.stringify(funko));
+    }
 
 }
 

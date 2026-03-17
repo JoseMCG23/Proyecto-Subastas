@@ -26,6 +26,7 @@ import UserUpdate from "@/components/User/UserUpdate";
 /////nuevo de cris de funko
 import FunkoList from "@/components/Funko/FunkoList";
 import FunkoCreate from "@/components/Funko/FunkoCreate";
+import FunkoUpdate from "@/components/Funko/FunkoUpdate";
 import FunkoDetail from "@/components/Funko/FunkoDetail";
 
 //import subasta
@@ -56,6 +57,10 @@ const rutas = createBrowserRouter([
       //rutas de funkooooooooooooooooo
       { path: "funkos", element: <FunkoList /> },
       { path: "funkos/create", element: <FunkoCreate /> },
+      {
+        path: "funkos/update/:id",
+        element: <FunkoUpdate />,
+      },
       { path: "funkos/:id", element: <FunkoDetail /> },
      
     //Rutas actualizar usuario
