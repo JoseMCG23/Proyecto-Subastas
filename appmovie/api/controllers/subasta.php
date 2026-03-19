@@ -55,4 +55,66 @@ class subasta
             handleException($e);
         }
     }
+
+    
+    //POST Crear
+    public function create()
+    {
+        try {
+            $request = new Request();
+            $response = new Response();
+            //Obtener json enviado
+            $inputJSON = $request->getJSON();
+            //Instancia del modelo
+            $subasta = new SubastaModel();
+            //Acción del modelo a ejecutar
+            $result = $subasta->create($inputJSON);
+            //Dar respuesta
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            $response->toJSON($result);
+            handleException($e);
+        }
+    }
+
+    // PUT Actualizar
+    public function update()
+    {
+        try {
+            $request = new Request();
+            $response = new Response();
+            $inputJSON = $request->getJSON();
+
+            $subasta = new SubastaModel();
+            $result = $subasta->update($inputJSON);
+
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+
+    // Publicar
+    public function publicar($id){
+        try {
+            $response = new Response();
+            $m = new SubastaModel();
+            $result = $m->publicar($id);
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+
+    //cancelar
+    public function cancelar($id){
+        try {
+            $response = new Response();
+            $m = new SubastaModel();
+            $result = $m->cancelar($id);
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
 }

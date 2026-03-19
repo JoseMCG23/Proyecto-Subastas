@@ -35,6 +35,10 @@ import { SubastaVista } from "@/components/subasta/SubastaVista";
 //import historial de pujas 
 import { HistorialPujas } from "@/components/pujas/HistorialPujas";
 
+//import manntenimiento subasta
+import { MantenimientoSubasta } from "@/components/subasta/MantenimientoSubasta";
+
+
 const rutas = createBrowserRouter([
   {
     element: <Layout/>,
@@ -70,6 +74,8 @@ const rutas = createBrowserRouter([
       { path: "subastas/:id", element: <SubastaVista /> },
       //Ruta historial de pujas
       { path: "subastas/:id/pujas", element: <HistorialPujas /> },
+      //Ruta mantenimiento subasta
+      {path: "mantenimiento-subastas", element: <MantenimientoSubasta />},
     ]
   }
 ])

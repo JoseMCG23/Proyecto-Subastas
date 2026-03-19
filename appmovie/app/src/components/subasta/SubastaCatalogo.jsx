@@ -5,10 +5,12 @@ import SubastaService from "@/services/SubastaService";
 const API_UPLOADS = "http://localhost:81/appmovie/api/uploads";
 
 const CATS = ["Todas", "Marvel", "DC", "Disney", "Anime", "Star Wars", "Exclusivo"];
+const ESTADOS = ["Todas", "ACTIVA", "INACTIVA", "FINALIZADA", "CANCELADA"];
 
 export function SubastaCatalogo() {
     const [subastas, setSubastas] = useState([]);
     const [activeCat, setActiveCat] = useState("Todas");
+    const [activeEstado, setActiveEstado] = useState("Todas");
     const [searchParams] = useSearchParams();
 
     const q = (searchParams.get("q") || "").toLowerCase();
@@ -23,6 +25,7 @@ export function SubastaCatalogo() {
         return subastas.filter((s) => {
             const nombre = (s.objeto || s.nombre || "").toLowerCase();
             const categorias = (s.categorias || "").toLowerCase();
+            const estado = (s.estado || "").toUpperCase();
 
             const matchSearch =
                 !q || nombre.includes(q) || categorias.includes(q);
@@ -31,9 +34,13 @@ export function SubastaCatalogo() {
                 activeCat === "Todas" ||
                 categorias.includes(activeCat.toLowerCase());
 
-            return matchSearch && matchCat;
+            const matchEstado =
+                activeEstado === "Todas" ||
+                estado === activeEstado;
+
+            return matchSearch && matchCat && matchEstado;
         });
-    }, [subastas, q, activeCat]);
+    }, [subastas, q, activeCat, activeEstado]);
 
     return (
         <div className="space-y-8">
@@ -60,6 +67,22 @@ export function SubastaCatalogo() {
                 ))}
             </div>
 
+            <div className="flex flex-wrap gap-2">
+                {ESTADOS.map((estado) => (
+                    <button
+                        key={estado}
+                        onClick={() => setActiveEstado(estado)}
+                        className={`px-4 py-2 rounded-full text-sm font-semibold ring-1 ring-white/10 transition
+                        ${activeEstado === estado
+                                ? "bg-emerald-500/20 text-emerald-200"
+                                : "bg-white/5 text-white/70 hover:bg-white/10"
+                            }`}
+                    >
+                        {estado}
+                    </button>
+                ))}
+            </div>
+
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
                 {filtered.map((s) => {
                     const imgName =
@@ -69,37 +92,7 @@ export function SubastaCatalogo() {
                         ? `${API_UPLOADS}/${imgName}`
                         : "";
 
-                    const getStatusConfig = () => {
-                        const status = s.estado || "";
-                        if (status === "FINALIZADA") {
-                            return {
-                                label: "Finalizada",
-                                bg: "bg-blue-500/20",
-                                text: "text-blue-300",
-                                border: "border-blue-500/30",
-                                dot: "bg-blue-400"
-                            };
-                        } else if (status === "CANCELADA") {
-                            return {
-                                label: "Cancelada",
-                                bg: "bg-red-500/20",
-                                text: "text-red-300",
-                                border: "border-red-500/30",
-                                dot: "bg-red-400"
-                            };
-                        } else if (status !== "ACTIVA") {
-                            return {
-                                label: "Inactiva",
-                                bg: "bg-gray-500/20",
-                                text: "text-gray-300",
-                                border: "border-gray-500/30",
-                                dot: "bg-gray-400"
-                            };
-                        }
-                        return null;
-                    };
-                    
-                    const statusConfig = getStatusConfig();
+
 
                     return (
                         <Link
@@ -107,13 +100,6 @@ export function SubastaCatalogo() {
                             to={`/subastas/${s.idsubasta}`}
                             className="group overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-2xl shadow-violet-500/5 transition hover:-translate-y-0.5 hover:border-violet-400/30 relative"
                         >
-                            {/* Estado para subastas no activas */}
-                            {statusConfig && (
-                                <div className={`absolute top-3 right-3 z-10 flex items-center gap-2 ${statusConfig.bg} ${statusConfig.text} px-3 py-1 rounded-full text-xs font-semibold border ${statusConfig.border}`}>
-                                    <span className={`w-2 h-2 ${statusConfig.dot} rounded-full`}></span>
-                                    {statusConfig.label}
-                                </div>
-                            )}
                             <div className="relative aspect-square w-full overflow-hidden bg-black/30">
                                 {imgSrc ? (
                                     <img

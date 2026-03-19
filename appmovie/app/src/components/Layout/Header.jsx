@@ -48,7 +48,7 @@ export default function Header() {
   const mantItems = [
     { title: "Usuarios", href: "/users", icon: <Wrench className="h-4 w-4" /> },
     { title: "Funkos", href: "/funkos", icon: <Wrench className="h-4 w-4" /> },
-    { title: "Subastas", href: "/subastas", icon: <Gavel className="h-4 w-4" /> },
+    { title: "Subastas", href: "/mantenimiento-subastas", icon: <Gavel className="h-4 w-4" /> },
   ];
 
   const userItems = [
