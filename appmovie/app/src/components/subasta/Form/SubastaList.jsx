@@ -237,12 +237,12 @@ export function SubastaList({ onCreate, onEdit, onViewDetail, onPublish, onCance
                                         {/* Contenido */}
                                         <div className="p-6 flex-1 flex flex-col">
                                             {/* Título */}
-                                            <h3 className="font-bold text-xl text-white mb-2 line-clamp-2 group-hover:text-violet-300 transition-colors duration-200">
+                                            <h3 className="font-bold text-xl text-white mb-2 line-clamp-2 min-h-[3.75rem] group-hover:text-violet-300 transition-colors duration-200">
                                                 {s.objeto || s.nombre}
                                             </h3>
 
                                             {/* Información */}
-                                            <div className="mt-4 flex-1 flex flex-col justify-between">
+                                            <div className="mt-4 flex-1 flex flex-col justify-between min-h-[155px]">
                                                 <div className="mb-4">
                                                     <p className="text-sm text-white/60 mb-1">
                                                         Precio base

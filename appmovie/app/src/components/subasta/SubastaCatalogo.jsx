@@ -119,10 +119,7 @@ export function SubastaCatalogo() {
                                     {s.objeto || s.nombre}
                                 </p>
 
-                                <div className="mt-4 flex-1 flex flex-col justify-end">
-                                    {(s.estado === "FINALIZADA" || s.estado === "CANCELADA") ? (
-
-                                <div className="flex justify-between items-center">
+                                <div className="mt-4 flex-1 flex flex-col justify-between min-h-35">
                                     <div>
                                         <p className="text-xs text-white/50">Precio base</p>
                                         <p className="text-lg font-extrabold text-emerald-300">
@@ -130,41 +127,34 @@ export function SubastaCatalogo() {
                                         </p>
                                     </div>
 
-                                    <div className="w-32 bg-violet-500/10 border border-violet-500/20 rounded px-1.5 py-0.5">
-                                        <p className="text-white/50 text-[10px] text-center">Fecha cierre</p>
-                                        <p className="font-bold text-violet-300 text-center">
-                                            {s.fechafin ? new Date(s.fechafin).toLocaleDateString("es-ES") : "—"}
-                                        </p>
+                                    <div className="grid grid-cols-2 gap-2 text-xs">
+                                        {(s.estado === "FINALIZADA" || s.estado === "CANCELADA") ? (
+                                            <>
+                                                <div className="col-span-2 w-full bg-violet-500/10 border border-violet-500/20 rounded px-2 py-1">
+                                                    <p className="text-white/50 text-[10px] text-center">Fecha cierre</p>
+                                                    <p className="font-bold text-violet-300 text-center">
+                                                        {s.fechafin ? new Date(s.fechafin).toLocaleDateString("es-ES") : "—"}
+                                                    </p>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div className="bg-violet-500/10 border border-violet-500/20 rounded px-2 py-1">
+                                                    <p className="text-white/50 text-[10px]">Pujas</p>
+                                                    <p className="font-bold text-violet-300">
+                                                        {s.cantidadPujas || 0}
+                                                    </p>
+                                                </div>
+
+                                                <div className="bg-blue-500/10 border border-blue-500/20 rounded px-2 py-1">
+                                                    <p className="text-white/50 text-[10px]">Incremento mínimo</p>
+                                                    <p className="font-bold text-blue-300">
+                                                        ₡{Number(s.incre_minimo || 0).toLocaleString("es-CR")}
+                                                    </p>
+                                                </div>
+                                            </>
+                                        )}
                                     </div>
-                                </div>
-
-                            ) : (
-
-                                <>
-                                    <div>
-                                        <p className="text-xs text-white/50">Precio base</p>
-                                        <p className="text-lg font-extrabold text-emerald-300">
-                                            ₡{Number(s.precioBase || 0).toLocaleString("es-CR")}
-                                        </p>
-                                    </div>
-
-                                    <div className="flex gap-2 text-xs mt-2">
-                                        <div className="flex-1 bg-violet-500/10 border border-violet-500/20 rounded px-2 py-1">
-                                            <p className="text-white/50 text-[10px]">Pujas</p>
-                                            <p className="font-bold text-violet-300">
-                                                {s.cantidadPujas || 0}
-                                            </p>
-                                        </div>
-
-                                        <div className="flex-1 bg-blue-500/10 border border-blue-500/20 rounded px-2 py-1">
-                                            <p className="text-white/50 text-[10px]">Incremento mínimo</p>
-                                            <p className="font-bold text-blue-300">
-                                                ₡{Number(s.incre_minimo || 0).toLocaleString("es-CR")}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </>
-                            )}
                                 </div>
                             </div>
                         </Link>
