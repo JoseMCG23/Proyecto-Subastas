@@ -27,21 +27,24 @@ class FunkoModel
         $catM = new FunkoCategoriaModel();
 
         $sql = "SELECT idFunko, nombre, imagen_portada, vendedor_id, estado, condicion
-        FROM Funko
-        WHERE LOWER(estado) <> 'eliminado'
-        ORDER BY idFunko DESC;";
+            FROM Funko
+            ORDER BY idFunko DESC;";
         $r = $this->enlace->ExecuteSQL($sql);
 
         if (!empty($r) && is_array($r)) {
             for ($i = 0; $i < count($r); $i++) {
-                $r[$i]->categorias = $catM->getCategoriasFunko($r[$i]->idFunko);
-                $r[$i]->dueno = $this->getNombreDueno($r[$i]->vendedor_id);
+                $idFunko = $r[$i]->idFunko;
 
-                // olo lo necesario
+                $r[$i]->categorias = $catM->getCategoriasFunko($idFunko);
+                $r[$i]->dueno = $this->getNombreDueno($r[$i]->vendedor_id);
+                $r[$i]->tieneSubastaActiva = $this->tieneSubastaActiva($idFunko);
+
+                // solo lo necesario
                 unset($r[$i]->vendedor_id);
             }
         }
-        return $r;
+
+        return $r ?: [];
     }
 
     /**
@@ -53,9 +56,8 @@ class FunkoModel
         $imgM = new FunkoImagenModel();
 
         $sql = "SELECT idFunko, nombre, descripcion, estado, condicion, fecha_registro, vendedor_id, imagen_portada
-                FROM Funko
-              WHERE idFunko=$id
-  AND LOWER(estado) <> 'eliminado';";
+        FROM Funko
+        WHERE idFunko=$id;";
         $r = $this->enlace->executeSQL($sql);
 
         if (!empty($r)) {

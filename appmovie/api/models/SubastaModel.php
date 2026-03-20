@@ -60,32 +60,45 @@ class SubastaModel {
     }
 
     //Subastas activas
-    public function getActivas(){
-        $sql = "SELECT s.idsubasta, f.nombre AS objeto, f.imagen_portada AS imagen, s.fechaInicio, s.fechafin AS fechaCierreEstimada, s.precioBase
-                FROM subasta s INNER JOIN Funko f ON s.funko_id = f.idFunko WHERE s.estado = 'ACTIVA' ORDER BY s.fechaInicio DESC;";
+    public function getActivas()
+    {
+        $sql = "SELECT s.idsubasta, f.nombre AS objeto, f.imagen_portada AS imagen, 
+                   s.fechaInicio, s.fechafin AS fechaCierreEstimada, s.precioBase
+            FROM subasta s
+            INNER JOIN Funko f ON s.funko_id = f.idFunko
+            WHERE s.estado = 'ACTIVA'
+            ORDER BY s.fechaInicio DESC;";
 
         $r = $this->enlace->ExecuteSQL($sql);
 
-        if (!empty($r)) {
+        if (!empty($r) && is_array($r)) {
             foreach ($r as $item) {
                 $item->cantidadPujas = $this->getCantidadPujas($item->idsubasta);
             }
         }
-        return $r;
+
+        return $r ?: [];
     }
 
     //Subastas finalizadas
-    public function getFinalizadas(){
-        $sql = "SELECT s.idsubasta, f.nombre AS objeto, f.imagen_portada AS imagen, s.fechafin AS fechaCierre, s.estado AS estadoFinal, s.precioBase
-                FROM subasta s INNER JOIN Funko f ON s.funko_id = f.idFunko WHERE s.estado IN ('FINALIZADA','CANCELADA') ORDER BY s.fechafin DESC;";
+    public function getFinalizadas()
+    {
+        $sql = "SELECT s.idsubasta, f.nombre AS objeto, f.imagen_portada AS imagen,
+                   s.fechafin AS fechaCierre, s.estado AS estadoFinal, s.precioBase
+            FROM subasta s
+            INNER JOIN Funko f ON s.funko_id = f.idFunko
+            WHERE s.estado IN ('FINALIZADA','CANCELADA')
+            ORDER BY s.fechafin DESC;";
 
         $r = $this->enlace->ExecuteSQL($sql);
-        if (!empty($r)) {
+
+        if (!empty($r) && is_array($r)) {
             foreach ($r as $item) {
                 $item->cantidadPujas = $this->getCantidadPujas($item->idsubasta);
             }
         }
-        return $r;
+
+        return $r ?: [];
     }
 
     //Detalle de una subasta en especifico

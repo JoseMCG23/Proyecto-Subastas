@@ -25,21 +25,14 @@ class FunkoCategoriaModel
 
     public function getCategoriasFunko($idFunko)
     {
-        
-        $sql = "SELECT nombre
-                FROM Categoria
-                WHERE idCategoria IN (
-                    SELECT categoria_id FROM Funko_Categoria WHERE funko_id=$idFunko
-                );";
-        $r = $this->enlace->executeSQL($sql);
+        $sql = "SELECT c.idCategoria, c.nombre
+            FROM Categoria c
+            INNER JOIN Funko_Categoria fc ON c.idCategoria = fc.categoria_id
+            WHERE fc.funko_id = $idFunko
+            ORDER BY c.nombre ASC;";
 
-        $cats = [];
-        if (!empty($r) && is_array($r)) {
-            for ($i = 0; $i < count($r); $i++) {
-                $cats[] = $r[$i]->nombre;
-            }
-        }
-        return $cats;
+        $r = $this->enlace->executeSQL($sql);
+        return (!empty($r) && is_array($r)) ? $r : [];
     }
 
 

@@ -4,25 +4,34 @@ import PropTypes from "prop-types";
 import { cn } from "@/lib/utils";
 import { AlertCircle } from "lucide-react";
 
-export const CustomInputField = ({ label, error, ...props }) => (
-    <div className="mb-4">
-        <Label className="block mb-1 text-sm font-medium">{label}</Label>
-        <Input {...props}  className={cn(
-        "w-full rounded-xl border border-gray-300 shadow-sm text-base",
-        "placeholder:text-gray-400 bg-transparent hover:bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/30 transition-all duration-200",
-        error && "border-red-500 focus:border-red-500 focus:ring-red-300"
-      )} />
-        {/* Mensaje de error */}
+export const CustomInputField = ({ label, error, className, ...props }) => (
+  <div className="w-full space-y-2">
+    {label && (
+      <Label className="block text-sm font-medium text-white/85">{label}</Label>
+    )}
+
+    <Input
+      {...props}
+      className={cn(
+        "h-11 w-full rounded-2xl border border-white/10 bg-black/20 text-white shadow-none",
+        "placeholder:text-white/35 hover:bg-white/[0.04] focus:border-violet-400/40 focus:ring-2 focus:ring-violet-400/20",
+        "disabled:cursor-not-allowed disabled:opacity-100 disabled:text-white/65",
+        error && "border-red-400/50 focus:border-red-400/50 focus:ring-red-400/20",
+        className
+      )}
+    />
+
     {error && (
-      <p className="flex items-center gap-1 mt-1 text-sm text-red-500">
+      <p className="flex items-center gap-1.5 text-sm text-red-400">
         <AlertCircle className="h-4 w-4" />
         {error}
       </p>
     )}
-    </div>
+  </div>
 );
 
 CustomInputField.propTypes = {
-    label: PropTypes.string.isRequired,
-    error: PropTypes.string,
+  label: PropTypes.string,
+  error: PropTypes.string,
+  className: PropTypes.string,
 };

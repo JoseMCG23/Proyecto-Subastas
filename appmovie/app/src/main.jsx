@@ -3,6 +3,7 @@
 
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { Toaster } from "react-hot-toast";
 import './index.css'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { Layout } from './components/Layout/Layout'
@@ -28,7 +29,7 @@ import FunkoList from "@/components/Funko/FunkoList";
 import FunkoCreate from "@/components/Funko/FunkoCreate";
 import FunkoUpdate from "@/components/Funko/FunkoUpdate";
 import FunkoDetail from "@/components/Funko/FunkoDetail";
-
+import MantenimientoFunko from "@/components/Funko/MantenimientoFunko";
 //import subasta
 import { SubastaCatalogo } from "@/components/subasta/SubastaCatalogo";
 import { SubastaVista } from "@/components/subasta/SubastaVista";
@@ -65,6 +66,10 @@ const rutas = createBrowserRouter([
         path: "funkos/update/:id",
         element: <FunkoUpdate />,
       },
+      {
+        path: "/funkos",
+        element: <MantenimientoFunko />,
+      },
       { path: "funkos/:id", element: <FunkoDetail /> },
      
     //Rutas actualizar usuario
@@ -78,9 +83,27 @@ const rutas = createBrowserRouter([
       {path: "mantenimiento-subastas", element: <MantenimientoSubasta />},
     ]
   }
-])
+]);
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <RouterProvider router={rutas} />
-  </StrictMode>,
-)
+    <div>
+      <RouterProvider router={rutas} />
+
+      {/*  TOASTER  */}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: "#0f172a",
+            color: "#fff",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: "16px",
+            padding: "12px 14px",
+          },
+        }}
+      />
+    </div>
+  </StrictMode>
+);
