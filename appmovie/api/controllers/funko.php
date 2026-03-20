@@ -66,5 +66,37 @@ class funko
         }
     }
 
-    
+    // PUT Eliminación lógica
+    public function deleteLogic()
+    {
+        try {
+            $request = new Request();
+            $response = new Response();
+            $inputJSON = $request->getJSON();
+
+            $funko = new FunkoModel();
+            $result = $funko->deleteLogic($inputJSON->idFunko);
+
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+
+    // PUT Activar / Desactivar
+    public function changeState()
+    {
+        try {
+            $request = new Request();
+            $response = new Response();
+            $inputJSON = $request->getJSON();
+
+            $funko = new FunkoModel();
+            $result = $funko->changeState($inputJSON->idFunko);
+
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
 }

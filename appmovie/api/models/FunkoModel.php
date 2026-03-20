@@ -26,9 +26,10 @@ class FunkoModel
     {
         $catM = new FunkoCategoriaModel();
 
-        $sql = "SELECT idFunko, nombre, imagen_portada, vendedor_id
-                FROM Funko
-                ORDER BY idFunko DESC;";
+        $sql = "SELECT idFunko, nombre, imagen_portada, vendedor_id, estado, condicion
+        FROM Funko
+        WHERE LOWER(estado) <> 'eliminado'
+        ORDER BY idFunko DESC;";
         $r = $this->enlace->ExecuteSQL($sql);
 
         if (!empty($r) && is_array($r)) {
@@ -53,7 +54,8 @@ class FunkoModel
 
         $sql = "SELECT idFunko, nombre, descripcion, estado, condicion, fecha_registro, vendedor_id, imagen_portada
                 FROM Funko
-                WHERE idFunko=$id;";
+              WHERE idFunko=$id
+  AND LOWER(estado) <> 'eliminado';";
         $r = $this->enlace->executeSQL($sql);
 
         if (!empty($r)) {
@@ -118,18 +120,7 @@ class FunkoModel
         return $this->get($idFunko);
     }
 
-    /**
-     * Verifica si el funko tiene una subasta activa
-     */
-    private function tieneSubastaActiva($idFunko)
-    {
-        $sql = "SELECT idsubasta
-            FROM subasta
-            WHERE funko_id = $idFunko
-              AND LOWER(estado) = 'activa';";
-        $r = $this->enlace->executeSQL($sql);
-        return (!empty($r));
-    }
+ 
 
     /**
      * Actualizar funko
@@ -187,7 +178,89 @@ class FunkoModel
         // Retornar funko actualizado
         return $this->get($idFunko);
     }
+    /**
+     * Verifica si el funko tiene una subasta activa
+     */
+    private function tieneSubastaActiva($idFunko)
+    {
+        $sql = "SELECT idsubasta
+            FROM subasta
+            WHERE funko_id = $idFunko
+              AND UPPER(estado) = 'ACTIVA';";
+        $r = $this->enlace->executeSQL($sql);
+        return (!empty($r));
+    }
 
+    /**
+     * Verifica si el funko ha sido subastado alguna vez
+     */
+    private function haSidoSubastado($idFunko)
+    {
+        $sql = "SELECT idsubasta
+            FROM subasta
+            WHERE funko_id = $idFunko
+            LIMIT 1;";
+        $r = $this->enlace->executeSQL($sql);
+        return (!empty($r));
+    }
 
-    
+    /**
+     * Obtiene el estado actual del funko
+     */
+    private function getEstadoActual($idFunko)
+    {
+        $sql = "SELECT estado
+            FROM Funko
+            WHERE idFunko = $idFunko
+            LIMIT 1;";
+        $r = $this->enlace->executeSQL($sql);
+        return (!empty($r)) ? $r[0]->estado : null;
+    }
+    public function deleteLogic($idFunko)
+    {
+        if ($this->haSidoSubastado($idFunko)) {
+            throw new Exception("No se puede eliminar el funko porque ya fue subastado");
+        }
+
+        if ($this->tieneSubastaActiva($idFunko)) {
+            throw new Exception("No se puede eliminar el funko porque pertenece a una subasta activa");
+        }
+
+        $sql = "UPDATE Funko
+            SET estado = 'Eliminado'
+            WHERE idFunko = $idFunko";
+
+        $this->enlace->executeSQL_DML($sql);
+
+        return [
+            "success" => true,
+            "message" => "Funko eliminado lógicamente",
+            "idFunko" => $idFunko
+        ];
+    }
+
+    public function changeState($idFunko)
+    {
+        $estadoActual = $this->getEstadoActual($idFunko);
+
+        if (!$estadoActual) {
+            throw new Exception("Funko no encontrado");
+        }
+
+        if (strtolower($estadoActual) === 'eliminado') {
+            throw new Exception("No se puede activar o desactivar un funko eliminado");
+        }
+
+        $nuevoEstado = in_array(strtolower($estadoActual), ['activo', 'disponible'])
+            ? 'Inactivo'
+            : 'Activo';
+
+        $sql = "UPDATE Funko
+            SET estado = '$nuevoEstado'
+            WHERE idFunko = $idFunko";
+
+        $this->enlace->executeSQL_DML($sql);
+
+        return $this->get($idFunko);
+    }
 }

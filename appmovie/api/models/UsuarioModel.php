@@ -127,6 +127,27 @@ class UsuarioModel
         
         return $this->get($objeto->id);
     }
+    public function changeState($objeto)
+    {
+        // Consultar estado actual
+        $sql = "SELECT id, estado FROM Usuario WHERE id=$objeto->id";
+        $resultado = $this->enlace->executeSQL($sql);
 
+        if (empty($resultado)) {
+            return null;
+        }
+
+        $estadoActual = strtoupper($resultado[0]->estado);
+        $nuevoEstado = ($estadoActual == "ACTIVO") ? "INACTIVO" : "ACTIVO";
+
+        // Update lógico
+        $sql = "UPDATE Usuario SET estado ='$nuevoEstado' " .
+            "WHERE id=$objeto->id";
+
+        $cResults = $this->enlace->executeSQL_DML($sql);
+
+        // Retornar usuario actualizado
+        return $this->get($objeto->id);
+    }
 }
 

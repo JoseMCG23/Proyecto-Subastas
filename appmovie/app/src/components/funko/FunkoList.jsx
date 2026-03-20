@@ -23,11 +23,17 @@ export default function FunkoList() {
     const filtered = useMemo(() => {
         const text = q.trim().toLowerCase();
         if (!text) return funkos;
+
         return funkos.filter((f) => {
             const nombre = (f?.nombre ?? "").toLowerCase();
-            const cat = (f?.categoria ?? f?.categorias ?? "").toString().toLowerCase();
-            const dueno = (f?.dueno ?? f?.vendedor ?? f?.nombreVendedor ?? "").toString().toLowerCase();
-            return nombre.includes(text) || cat.includes(text) || dueno.includes(text);
+
+            const categorias = Array.isArray(f?.categorias)
+                ? f.categorias.join(" ").toLowerCase()
+                : (f?.categoria ?? "").toString().toLowerCase();
+
+            const estado = (f?.estado ?? "").toString().toLowerCase();
+
+            return nombre.includes(text) || categorias.includes(text) || estado.includes(text);
         });
     }, [funkos, q]);
 
@@ -35,7 +41,9 @@ export default function FunkoList() {
         <div className="mx-auto max-w-6xl px-4 pb-12 pt-6">
             <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-white">Catálogo de Funkos</h1>
+                    <h1 className="text-2xl font-bold tracking-tight text-white">
+                        Catálogo de Funkos
+                    </h1>
                     <p className="mt-1 text-sm text-white/60">
                         {filtered.length} objetos disponibles
                     </p>
@@ -46,7 +54,7 @@ export default function FunkoList() {
                         <input
                             value={q}
                             onChange={(e) => setQ(e.target.value)}
-                            placeholder="Buscar por nombre, categoría o dueño…"
+                            placeholder="Buscar por nombre, categoría o estado..."
                             className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/40 outline-none ring-0 focus:border-violet-400/40"
                         />
                     </div>
@@ -64,9 +72,14 @@ export default function FunkoList() {
                 {filtered.map((f) => {
                     const id = f?.idFunko ?? f?.id ?? f?.id_funko;
                     const nombre = f?.nombre ?? "Sin nombre";
-                    const categoria = f?.categoria ?? (Array.isArray(f?.categorias) ? f.categorias.join(", ") : f?.categorias);
-                    const dueno = f?.dueno ?? f?.vendedor ?? f?.nombreVendedor;
+                    const estado = f?.estado ?? "—";
                     const portada = f?.imagen_portada ?? f?.imagenPortada ?? f?.portada;
+
+                    const categorias = Array.isArray(f?.categorias)
+                        ? f.categorias
+                        : f?.categoria
+                            ? [f.categoria]
+                            : [];
 
                     return (
                         <div
@@ -87,23 +100,28 @@ export default function FunkoList() {
                                     </div>
                                 )}
 
-                                <div className="absolute left-3 top-3 flex gap-2">
-                                    {categoria ? (
-                                        <span className={`${chipBase} bg-violet-500/15 text-violet-200`}>
-                                            {String(categoria)}
-                                        </span>
-                                    ) : null}
+                                <div className="absolute left-3 top-3 flex flex-wrap gap-2 max-w-[85%]">
+                                    {categorias.length > 0
+                                        ? categorias.map((cat, index) => (
+                                            <span
+                                                key={index}
+                                                className={`${chipBase} bg-violet-500/15 text-violet-200`}
+                                            >
+                                                {typeof cat === "string" ? cat : cat?.nombre ?? "—"}
+                                            </span>
+                                        ))
+                                        : null}
                                 </div>
                             </div>
 
                             <div className="p-5">
-                                <h3 className="line-clamp-1 text-base font-semibold text-white">
+                                <h3 className="line-clamp-2 text-base font-semibold text-white min-h-[48px]">
                                     {nombre}
                                 </h3>
 
                                 <div className="mt-3 flex items-center justify-between text-sm text-white/60">
                                     <span className="line-clamp-1">
-                                        Dueño: <span className="text-white/80">{dueno ?? "—"}</span>
+                                        Estado: <span className="text-white/80">{estado}</span>
                                     </span>
 
                                     <div className="flex items-center gap-3">

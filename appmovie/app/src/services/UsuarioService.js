@@ -19,7 +19,13 @@ class UsuarioService {
         return axios.get(BASE_URL + "/" + idUsuario);
     }
 
-
+    changeState(usuario) {
+        return axios({
+            method: "patch",
+            url: BASE_URL + "/changeState",
+            data: JSON.stringify(usuario),
+        });
+    }
     /// actualizar usuario
     // Actualizar usuario
     updateUsuario(usuario) {
@@ -29,6 +35,16 @@ class UsuarioService {
             data: JSON.stringify(usuario),
         });
     }
+
+    
+
+
+
+
+
+
+
+
 }
 
 

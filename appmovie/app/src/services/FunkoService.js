@@ -14,15 +14,21 @@ class FunkoService {
         return axios.get(BASE_URL + "/" + idFunko);
     }
 
-// Crear
+    // Crear
     createFunko(funko) {
         return axios.post(BASE_URL, JSON.stringify(funko));
     }
-// Actualizar
+    // Actualizar
     updateFunko(funko) {
         return axios.put(BASE_URL, JSON.stringify(funko));
     }
+    deleteLogicFunko(idFunko) {
+        return axios.put(BASE_URL + "/deleteLogic", JSON.stringify({ idFunko }));
+    }
 
+    changeStateFunko(idFunko) {
+        return axios.put(BASE_URL + "/changeState", JSON.stringify({ idFunko }));
+    }
 }
 
 export default new FunkoService();

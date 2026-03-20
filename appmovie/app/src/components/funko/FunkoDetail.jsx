@@ -1,39 +1,71 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import toast from "react-hot-toast";
 import FunkoService from "@/services/FunkoService";
+import { Button } from "@/components/ui/button";
+import {
+    Pencil,
+    Power,
+    Trash2,
+    CalendarDays,
+    UserRound,
+    Tag,
+    AlertTriangle,
+} from "lucide-react";
 
 export default function FunkoDetail() {
     const { id } = useParams();
+    const navigate = useNavigate();
+
     const [funko, setFunko] = useState(null);
     const [error, setError] = useState("");
+    const [loadingAction, setLoadingAction] = useState(false);
+    const [selectedImage, setSelectedImage] = useState(0);
 
     const uploadBaseUrl = import.meta.env.VITE_BASE_URL + "uploads/";
 
+    const loadFunko = async () => {
+        try {
+            const res = await FunkoService.getFunkoById(id);
+            const payload = res.data?.data ?? res.data;
+            setFunko(payload);
+            setSelectedImage(0);
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
     useEffect(() => {
-        FunkoService.getFunkoById(id)
-            .then((res) => {
-                const payload = res.data?.data ?? res.data;
-                setFunko(payload);
-            })
-            .catch((err) => setError(err.message));
+        loadFunko();
     }, [id]);
 
-    const portada = funko?.imagen_portada ? `${uploadBaseUrl}${funko.imagen_portada}` : null;
+    const portada = funko?.imagen_portada
+        ? `${uploadBaseUrl}${funko.imagen_portada}`
+        : null;
 
     const galeria = useMemo(() => {
         if (!funko) return [];
+
         let extra = [];
+
         if (Array.isArray(funko.imagenes)) {
-            extra = funko.imagenes.map((x) => (typeof x === "string" ? x : x?.url)).filter(Boolean);
+            extra = funko.imagenes
+                .map((x) => (typeof x === "string" ? x : x?.urlImagen ?? x?.url))
+                .filter(Boolean);
         } else if (Array.isArray(funko.imagenes_adicionales)) {
-            extra = funko.imagenes_adicionales.map((x) => (typeof x === "string" ? x : x?.url)).filter(Boolean);
+            extra = funko.imagenes_adicionales
+                .map((x) => (typeof x === "string" ? x : x?.urlImagen ?? x?.url))
+                .filter(Boolean);
         }
 
-        const extraUrls = extra.map((img) => (img.startsWith("http") ? img : `${uploadBaseUrl}${img}`));
-        return [...(portada ? [portada] : []), ...extraUrls];
+        const extraUrls = extra.map((img) =>
+            img.startsWith("http") ? img : `${uploadBaseUrl}${img}`
+        );
+
+        const all = [...(portada ? [portada] : []), ...extraUrls];
+        return [...new Set(all)];
     }, [funko, portada, uploadBaseUrl]);
 
-    // dueño por si se manda distintos nombres
     const dueno = useMemo(() => {
         if (!funko) return "—";
         return (
@@ -47,109 +79,236 @@ export default function FunkoDetail() {
         );
     }, [funko]);
 
-    // historial
     const historial = useMemo(() => {
         if (!funko) return [];
-        const arr = Array.isArray(funko.subastas) ? funko.subastas : [];
-        const activa = funko.subastaActiva ? [funko.subastaActiva] : [];
-        // evita duplicados por id
-        const all = [...activa, ...arr];
-        const seen = new Set();
-        return all.filter((s) => {
-            const sid = s?.idsubasta ?? s?.idSubasta ?? s?.id_subasta ?? s?.id;
-            if (!sid || seen.has(sid)) return false;
-            seen.add(sid);
-            return true;
-        });
+        return Array.isArray(funko.subastas) ? funko.subastas : [];
     }, [funko]);
+
+    const categorias = Array.isArray(funko?.categorias)
+        ? funko.categorias
+        : funko?.categoria
+            ? [funko.categoria]
+            : [];
+
+    const tieneSubastaActiva = historial.some(
+        (s) => String(s?.estado ?? "").toUpperCase() === "ACTIVA"
+    );
 
     if (error) return <div className="p-6 text-white">Error: {error}</div>;
     if (!funko) return <div className="p-6 text-white">Cargando...</div>;
 
-    const categoria = Array.isArray(funko.categorias) ? funko.categorias[0] : funko.categoria;
+    const idFunko = funko.idFunko ?? funko.id;
     const condicion = funko.condicion ?? "—";
     const estado = funko.estado ?? "—";
-
     const fechaRegistro = funko.fechaRegistro ?? funko.fecha_registro ?? "—";
 
+    const noSePuedeEditar =
+        tieneSubastaActiva || String(estado).toLowerCase() === "eliminado";
+
+    const handleDeleteLogic = async () => {
+        const ok = window.confirm("¿Desea eliminar lógicamente este funko?");
+        if (!ok) return;
+
+        try {
+            setLoadingAction(true);
+            await FunkoService.deleteLogicFunko(idFunko);
+            toast.success("Funko eliminado lógicamente");
+            navigate("/funkos");
+        } catch (err) {
+            console.error(err);
+            toast.error(
+                err?.response?.data?.message ||
+                "No se pudo eliminar el funko"
+            );
+        } finally {
+            setLoadingAction(false);
+        }
+    };
+
+    const handleChangeState = async () => {
+        try {
+            setLoadingAction(true);
+            await FunkoService.changeStateFunko(idFunko);
+            toast.success("Estado actualizado correctamente");
+            await loadFunko();
+        } catch (err) {
+            console.error(err);
+            toast.error(
+                err?.response?.data?.message ||
+                "No se pudo cambiar el estado"
+            );
+        } finally {
+            setLoadingAction(false);
+        }
+    };
+
     return (
-        <div className="mx-auto max-w-[1100px] px-4 py-8 text-white">
-            <Link to="/funkos" className="text-sm text-white/70 hover:text-white">
+        <div className="mx-auto max-w-7xl px-4 py-8 text-white">
+            <Link
+                to="/funkos"
+                className="inline-flex items-center text-sm text-white/70 hover:text-white"
+            >
                 ← Volver al catálogo
             </Link>
 
-            <div className="mt-4 grid gap-6 lg:grid-cols-2">
-                {/* Imagen */}
-                <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
-                    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20">
-                        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-violet-500/10 via-transparent to-transparent" />
-                        {galeria[0] ? (
-                            <img
-                                src={galeria[0]}
-                                alt={funko.nombre}
-                                className="relative h-[420px] w-full object-contain p-4"
-                                onError={(e) => (e.currentTarget.style.display = "none")}
-                            />
-                        ) : (
-                            <div className="grid h-[420px] place-items-center text-sm text-white/40">
-                                Sin imagen
-                            </div>
-                        )}
+            <div className="mt-5 grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+                {/* Galería */}
+                <div className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-xl">
+                    <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                        <div className="flex items-center justify-center rounded-2xl bg-black/20 p-6">
+                            {galeria[selectedImage] ? (
+                                <img
+                                    src={galeria[selectedImage]}
+                                    alt={funko.nombre}
+                                    className="max-h-[480px] w-auto object-contain transition-all duration-300"
+                                    onError={(e) => (e.currentTarget.style.display = "none")}
+                                />
+                            ) : (
+                                <div className="grid h-[430px] w-full place-items-center text-sm text-white/40">
+                                    Sin imagen
+                                </div>
+                            )}
+                        </div>
                     </div>
 
-                    {/* mini galería */}
                     {galeria.length > 1 && (
-                        <div className="mt-3 flex gap-2 overflow-auto pb-1">
+                        <div className="mt-4 flex flex-wrap gap-3">
                             {galeria.slice(0, 6).map((src, idx) => (
                                 <button
                                     key={idx}
-                                    className="shrink-0 overflow-hidden rounded-xl border border-white/10 bg-white/5"
-                                    onClick={(e) => e.preventDefault()}
-                                    title="Vista previa"
+                                    type="button"
+                                    onClick={() => setSelectedImage(idx)}
+                                    className={`overflow-hidden rounded-xl border p-1 transition ${selectedImage === idx
+                                            ? "border-violet-400 bg-violet-500/10"
+                                            : "border-white/10 bg-white/5 hover:border-white/20"
+                                        }`}
                                 >
-                                    <img src={src} alt={`img-${idx}`} className="h-16 w-16 object-cover" />
+                                    <img
+                                        src={src}
+                                        alt={`img-${idx}`}
+                                        className="h-16 w-16 rounded-lg object-cover"
+                                    />
                                 </button>
                             ))}
                         </div>
                     )}
                 </div>
 
-                {/* información */}
-                <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-white/80">
-                        {categoria && (
-                            <span className="rounded-full border border-violet-400/20 bg-violet-500/10 px-3 py-1 text-violet-200">
-                                {categoria}
+                {/* Información */}
+                <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-xl">
+                    <div className="flex flex-wrap items-center gap-2">
+                        {categorias.map((cat, index) => (
+                            <span
+                                key={index}
+                                className="rounded-full border border-violet-400/20 bg-violet-500/10 px-3 py-1 text-xs font-medium text-violet-200"
+                            >
+                                {typeof cat === "string" ? cat : cat?.nombre ?? "—"}
                             </span>
-                        )}
-                        <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
+                        ))}
+
+                        <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/80">
                             {condicion}
                         </span>
-                        <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
+
+                        <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/80">
                             {estado}
                         </span>
                     </div>
 
-                    <h1 className="mt-3 text-2xl font-extrabold tracking-tight">
+                    <h1 className="mt-4 text-3xl font-extrabold leading-tight tracking-tight">
                         {funko.nombre ?? "Funko"}
                     </h1>
 
-                    <p className="mt-3 text-sm leading-relaxed text-white/70">
+                    <p className="mt-4 text-[15px] leading-7 text-white/75">
                         {funko.descripcion ?? "—"}
                     </p>
 
-                    <div className="mt-6 rounded-2xl border border-white/10 bg-black/10 p-4">
-                        <div className="grid gap-3 text-sm">
-                            <Row label="Dueño" value={dueno} />
-                            <Row label="Fecha registro" value={fechaRegistro} />
-                        </div>
+                    <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                        <InfoCard
+                            icon={<UserRound className="h-4 w-4" />}
+                            label="Dueño"
+                            value={dueno}
+                        />
+                        <InfoCard
+                            icon={<CalendarDays className="h-4 w-4" />}
+                            label="Fecha registro"
+                            value={fechaRegistro}
+                        />
                     </div>
+
+                    <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                        <Link
+                            to={noSePuedeEditar ? "#" : `/funkos/update/${idFunko}`}
+                            className="sm:col-span-1"
+                            onClick={(e) => {
+                                if (noSePuedeEditar) {
+                                    e.preventDefault();
+                                    toast.error("No se puede editar este funko");
+                                }
+                            }}
+                        >
+                            <Button
+                                type="button"
+                                className="w-full gap-2"
+                                disabled={loadingAction || noSePuedeEditar}
+                            >
+                                <Pencil className="h-4 w-4" />
+                                Editar
+                            </Button>
+                        </Link>
+
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            className="w-full gap-2"
+                            onClick={handleChangeState}
+                            disabled={
+                                loadingAction ||
+                                String(estado).toLowerCase() === "eliminado"
+                            }
+                        >
+                            <Power className="h-4 w-4" />
+                            {String(estado).toLowerCase() === "inactivo"
+                                ? "Activar"
+                                : "Desactivar"}
+                        </Button>
+
+                        <Button
+                            type="button"
+                            variant="destructive"
+                            className="w-full gap-2"
+                            onClick={handleDeleteLogic}
+                            disabled={
+                                loadingAction ||
+                                String(estado).toLowerCase() === "eliminado"
+                            }
+                        >
+                            <Trash2 className="h-4 w-4" />
+                            Eliminar
+                        </Button>
+                    </div>
+
+                    {noSePuedeEditar && (
+                        <div className="mt-4 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                            <div className="flex items-start gap-2">
+                                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                                <span>
+                                    {tieneSubastaActiva
+                                        ? "Este funko tiene una subasta activa y no puede editarse."
+                                        : "Este funko está eliminado y no puede modificarse."}
+                                </span>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
-            {/* historial */}
-            <div className="mt-6 rounded-3xl border border-white/10 bg-white/5 p-6">
-                <h3 className="text-lg font-semibold">Historial de subastas del objeto</h3>
+            {/* Historial */}
+            <div className="mt-6 rounded-3xl border border-white/10 bg-white/5 p-6 shadow-xl">
+                <div className="flex items-center gap-2">
+                    <Tag className="h-5 w-5 text-violet-300" />
+                    <h3 className="text-lg font-semibold">Historial de subastas del objeto</h3>
+                </div>
                 <p className="mt-1 text-sm text-white/60">ID, inicio, cierre y estado.</p>
 
                 {historial.length > 0 ? (
@@ -165,7 +324,12 @@ export default function FunkoDetail() {
                             </thead>
                             <tbody>
                                 {historial.map((s, idx) => {
-                                    const sid = s?.idsubasta ?? s?.idSubasta ?? s?.id_subasta ?? s?.id ?? idx + 1;
+                                    const sid =
+                                        s?.idsubasta ??
+                                        s?.idSubasta ??
+                                        s?.id_subasta ??
+                                        s?.id ??
+                                        idx + 1;
                                     const ini = s?.fechaInicio ?? s?.fecha_inicio ?? "—";
                                     const fin = s?.fechafin ?? s?.fechaFin ?? s?.fecha_fin ?? "—";
                                     const est = s?.estado ?? "—";
@@ -187,18 +351,23 @@ export default function FunkoDetail() {
                         </table>
                     </div>
                 ) : (
-                    <p className="mt-4 text-sm text-white/70">Este funko no tiene historial de subastas.</p>
+                    <div className="mt-4 rounded-2xl border border-white/10 bg-black/10 px-4 py-5 text-sm text-white/70">
+                        Este funko no tiene historial de subastas.
+                    </div>
                 )}
             </div>
         </div>
     );
 }
 
-function Row({ label, value }) {
+function InfoCard({ icon, label, value }) {
     return (
-        <div className="flex items-center justify-between gap-4">
-            <span className="text-white/70">{label}</span>
-            <span className="font-semibold">{value ?? "—"}</span>
+        <div className="rounded-2xl border border-white/10 bg-black/10 p-4">
+            <div className="flex items-center gap-2 text-sm text-white/60">
+                {icon}
+                <span>{label}</span>
+            </div>
+            <p className="mt-2 text-sm font-semibold text-white">{value ?? "—"}</p>
         </div>
     );
 }

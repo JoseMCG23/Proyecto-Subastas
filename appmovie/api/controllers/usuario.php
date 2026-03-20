@@ -41,10 +41,26 @@ class usuario
             //Dar respuesta
             $response->toJSON($result);
         } catch (Exception $e) {
-            $response->toJSON($result);
             handleException($e);
         }
     }
-
+    // PATCH cambiar estado lógico
+    public function changeState()
+    {
+        try {
+            $request = new Request();
+            $response = new Response();
+            // Obtener json enviado
+            $inputJSON = $request->getJSON();
+            // Instancia del modelo
+            $usuario = new UsuarioModel();
+            // Acción del modelo a ejecutar
+            $result = $usuario->changeState($inputJSON);
+            // Dar respuesta
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
 
 }
