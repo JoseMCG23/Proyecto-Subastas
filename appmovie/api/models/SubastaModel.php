@@ -260,7 +260,13 @@ class SubastaModel {
             throw new Exception("Subasta no encontrada");
         }
 
-        $sql = "UPDATE subasta SET estado = 'ACTIVA' WHERE idsubasta = $id;";
+        // Solo publicar subasta INACTIVA (subasta creada lista para programar)
+        if ($r[0]->estado != 'INACTIVA') {
+            throw new Exception("Solo se pueden publicar subastas INACTIVAS");
+        }
+
+        // Cambia a PROGRAMADA (lista para iniciar)
+        $sql = "UPDATE subasta SET estado = 'PROGRAMADA' WHERE idsubasta = $id;";
         $this->enlace->executeSQL_DML($sql);
 
         return $this->get($id);

@@ -22,16 +22,12 @@ export function SubastaCreate({ onClose, onSuccess }) {
                 const funkosRes = await FunkoService.getFunkos();
                 const funkosList = funkosRes.data.data || funkosRes.data || [];
 
-                // Filtrar funkos disponibles
+                // Filtrar funkos no asociados a ninguna subasta
                 const funkosDisponibles = funkosList.filter((f) => {
-
                     if (f.estado !== "DISPONIBLE") return false;
 
-                    const tieneSubastaActiva = subastasList.some(
-                        (s) => s.funko_id === f.idFunko && s.estado === "ACTIVA"
-                    );
-
-                    return !tieneSubastaActiva;
+                    const estaEnSubasta = subastasList.some((s) => s.funko_id === f.idFunko);
+                    return !estaEnSubasta;
                 });
 
                 setFunkos(funkosDisponibles);
@@ -57,6 +53,7 @@ export function SubastaCreate({ onClose, onSuccess }) {
                 ...data,
                 vendedor_id: data.usuario_id,
                 usuario_id: undefined,
+                estado: "INACTIVA", // Crear siempre como INACTIVA
             };
 
             await SubastaService.createSubasta(payload);

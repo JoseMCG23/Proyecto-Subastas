@@ -10,9 +10,9 @@ export function SubastaDetail({ subasta, onClose, onEdit, onPublish, onCancel })
         : "";
 
     const pujasCount = Number(subasta?.cantidadPujas ?? subasta?.cantidadTotalPujas ?? 0);
-    const canEdit = subasta?.estado === "INACTIVA" && pujasCount === 0;
+    const canEdit = (subasta?.estado === "INACTIVA" || subasta?.estado === "PROGRAMADA") && pujasCount === 0;
     const canPublish = subasta?.estado === "INACTIVA";
-    const canCancel = subasta?.estado === "INACTIVA";
+    const canCancel = subasta?.estado === "INACTIVA" || subasta?.estado === "PROGRAMADA";
 
     const nombreUsuarioCreador = subasta?.usuarioCreador || "Usuario desconocido";
 
@@ -87,7 +87,7 @@ export function SubastaDetail({ subasta, onClose, onEdit, onPublish, onCancel })
                                 </CardHeader>
                                 <CardContent className="pt-1 pb-1">
                                     <p className="text-base font-semibold text-white text-center">
-                                        {(subasta?.estado || "INACTIVA").charAt(0) + (subasta?.estado || "INACTIVA").slice(1).toLowerCase()}
+                                        {(subasta?.estado || "PROGRAMADA").charAt(0) + (subasta?.estado || "PROGRAMADA").slice(1).toLowerCase()}
                                     </p>
                                 </CardContent>
                             </Card>

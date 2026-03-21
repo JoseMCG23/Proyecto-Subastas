@@ -35,12 +35,14 @@ class SubastaService {
         return axios.put(BASE_URL, JSON.stringify(subasta));
     }
 
+    // Publicar
     publicarSubasta(idSubasta) {
-        return axios.post(`${BASE_URL}/publicar/${idSubasta}`);
+        return axios.put(`${BASE_URL}/publicar/${idSubasta}`);
     }
 
+    // Cancelar
     cancelarSubasta(idSubasta) {
-    return axios.post(`${BASE_URL}/cancelar/${idSubasta}`);
+        return axios.put(`${BASE_URL}/cancelar/${idSubasta}`);
     }
     
 }

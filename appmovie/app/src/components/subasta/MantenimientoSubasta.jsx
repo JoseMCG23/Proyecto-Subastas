@@ -28,9 +28,13 @@ export function MantenimientoSubasta() {
         setShowDetail(true);
     };
 
-    const handlePublish = async (id) => {
+    const handlePublish = async (idSubasta) => {
+        if (!idSubasta) {
+            toast.error('ID de subasta no disponible');
+            return;
+        }
         try {
-            await SubastaService.publicarSubasta(id);
+            await SubastaService.publicarSubasta(idSubasta);
             toast.success("Subasta publicada exitosamente");
             setRefreshKey(prev => prev + 1);
         } catch (err) {
@@ -39,13 +43,17 @@ export function MantenimientoSubasta() {
         }
     };
 
-    const handleCancel = async (id) => {
+    const handleCancel = async (idSubasta) => {
+        if (!idSubasta) {
+            toast.error('ID de subasta no disponible');
+            return;
+        }
         if (!window.confirm("¿Estás seguro de que deseas cancelar esta subasta?")) {
             return;
         }
 
         try {
-            await SubastaService.cancelarSubasta(id);
+            await SubastaService.cancelarSubasta(idSubasta);
             toast.success("Subasta cancelada exitosamente");
             setRefreshKey(prev => prev + 1);
         } catch (err) {
@@ -104,8 +112,8 @@ export function MantenimientoSubasta() {
                             setShowDetail(false);
                             setShowUpdate(true);
                         }}
-                        onPublish={() => handlePublish(selectedSubasta.idSubasta)}
-                        onCancel={() => handleCancel(selectedSubasta.idSubasta)}
+                        onPublish={() => handlePublish(selectedSubasta.idsubasta)}
+                        onCancel={() => handleCancel(selectedSubasta.idsubasta)}
                     />
                 )}
             </AnimatePresence>

@@ -33,7 +33,7 @@ export function SubastaUpdate({ subasta, onClose, onSuccess }) {
     }, []);
 
     const pujasCount = Number(subasta?.cantidadPujas ?? subasta?.cantidadTotalPujas ?? 0);
-    const canEditSubasta = subasta?.estado === "INACTIVA" && pujasCount === 0;
+    const canEditSubasta = (subasta?.estado === "INACTIVA" || subasta?.estado === "PROGRAMADA") && pujasCount === 0;
 
     const handleSubmit = async (data) => {
         try {
@@ -69,7 +69,7 @@ export function SubastaUpdate({ subasta, onClose, onSuccess }) {
                     <div className="max-w-md w-full rounded-2xl border border-white/20 bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 p-6 shadow-2xl">
                         <h3 className="text-xl font-bold text-white">Edición no permitida</h3>
                         <p className="mt-3 text-sm text-white/70">
-                            La subasta solo puede editarse si está inactiva, y no tiene pujas.
+                            La subasta solo puede editarse si está programada, y no tiene pujas.
                         </p>
                         <div className="mt-6 text-right">
                             <button

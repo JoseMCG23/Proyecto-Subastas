@@ -1,19 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SlidersHorizontal } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import SubastaService from "@/services/SubastaService";
 
 const API_UPLOADS = "http://localhost:81/appmovie/api/uploads";
 
-const CATS = ["Todas", "Marvel", "DC", "Disney", "Anime", "Star Wars", "Exclusivo"];
-const ESTADOS = ["Todas", "ACTIVA", "FINALIZADA", "CANCELADA", "INACTIVA"];
-
 export function SubastaList({ onCreate, onEdit, onViewDetail, onPublish, onCancel }) {
     const [subastas, setSubastas] = useState([]);
     const [error, setError] = useState("");
-    const [activeCat, setActiveCat] = useState("Todas");
-    const [activeEstado, setActiveEstado] = useState("Todas");
+    const [q, setQ] = useState("");
+    const [categoriaFiltro, setCategoriaFiltro] = useState("todas");
+    const [estadoFiltro, setEstadoFiltro] = useState("todos");
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
@@ -36,23 +35,51 @@ export function SubastaList({ onCreate, onEdit, onViewDetail, onPublish, onCance
         cargarDatos();
     }, []);
 
+    const categoriasDisponibles = useMemo(() => {
+        const setCategorias = new Set();
+
+        subastas.forEach((s) => {
+            const categorias = s?.categorias ? s.categorias.split(',').map(c => c.trim()) : [];
+            categorias.forEach((cat) => {
+                if (cat) setCategorias.add(cat);
+            });
+        });
+
+        return Array.from(setCategorias).sort((a, b) => a.localeCompare(b));
+    }, [subastas]);
+
     // Filtrado
     const filtered = useMemo(() => {
+        const text = q.trim().toLowerCase();
+
         return subastas.filter((s) => {
-            const categorias = (s.categorias || "").toLowerCase();
-            const estado = s.estado || "";
+            const nombre = (s?.objeto || s?.nombre || "").toLowerCase();
+            const estado = (s?.estado || "").toLowerCase();
+            const categorias = (s?.categorias || "").toLowerCase();
+            const estadoFiltroNormalizado = (estadoFiltro || "").toLowerCase();
 
-            const matchCat =
-                activeCat === "Todas" ||
-                categorias.includes(activeCat.toLowerCase());
+            const coincideBusqueda =
+                !text ||
+                nombre.includes(text) ||
+                estado.includes(text) ||
+                categorias.includes(text);
 
-            const matchEstado =
-                activeEstado === "Todas" ||
-                estado === activeEstado;
+            const coincideEstado =
+                estadoFiltroNormalizado === "todos" || estado === estadoFiltroNormalizado;
 
-            return matchCat && matchEstado;
+            const coincideCategoria =
+                categoriaFiltro === "todas" ||
+                categorias.includes(categoriaFiltro.toLowerCase());
+
+            return coincideBusqueda && coincideEstado && coincideCategoria;
         });
-    }, [subastas, activeCat, activeEstado]);
+    }, [subastas, q, categoriaFiltro, estadoFiltro]);
+
+    const limpiarFiltros = () => {
+        setQ("");
+        setCategoriaFiltro("todas");
+        setEstadoFiltro("todos");
+    };
 
     if (error) return <div className="p-6 text-white">Error: {error}</div>;
 
@@ -107,76 +134,78 @@ export function SubastaList({ onCreate, onEdit, onViewDetail, onPublish, onCance
                     </motion.div>
                 </motion.div>
 
-                {/* Filtros */}
-                <motion.div
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.5 }}
-                    className="mb-8 space-y-6"
-                >
-                    {/* Filtro por Categoría */}
-                    <Card className="bg-gradient-to-r from-white/10 to-white/5 border-white/20 shadow-xl">
-                        <CardHeader className="pb-4">
-                            <CardTitle className="text-lg font-bold text-white">
-                                Filtrar por Categoría
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex flex-wrap gap-3">
-                                {CATS.map((cat) => (
-                                    <motion.button
-                                        key={cat}
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 0.95 }}
-                                        onClick={() => setActiveCat(cat)}
-                                        className={`px-6 py-3 rounded-full text-sm font-bold ring-2 transition-all duration-200 ${
-                                            activeCat === cat
-                                                ? "bg-gradient-to-r from-violet-500 to-purple-500 text-white ring-violet-400 shadow-lg shadow-violet-500/30"
-                                                : "bg-gradient-to-r from-white/10 to-white/5 text-white/80 hover:text-white ring-white/20 hover:ring-white/40 hover:bg-white/20"
-                                        }`}
-                                    >
-                                        {cat}
-                                    </motion.button>
-                                ))}
+                <div className="grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+                    <aside className="h-fit rounded-3xl border border-white/10 bg-white/5 p-5 shadow-2xl shadow-violet-500/5 lg:sticky lg:top-6">
+                        <div className="mb-5 flex items-center gap-2">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-violet-500/15 ring-1 ring-violet-400/20">
+                                <SlidersHorizontal className="h-4 w-4 text-violet-300" />
                             </div>
-                        </CardContent>
-                    </Card>
+                            <h2 className="text-base font-semibold text-white">Filtros</h2>
+                        </div>
 
-                    {/* Filtro por Estado */}
-                    <Card className="bg-gradient-to-r from-white/10 to-white/5 border-white/20 shadow-xl">
-                        <CardHeader className="pb-4">
-                            <CardTitle className="text-lg font-bold text-white">
-                                Filtrar por Estado
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex flex-wrap gap-3">
-                                {ESTADOS.map((estado) => (
-                                    <motion.button
-                                        key={estado}
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 0.95 }}
-                                        onClick={() => setActiveEstado(estado)}
-                                        className={`px-6 py-3 rounded-full text-sm font-bold ring-2 transition-all duration-200 ${
-                                            activeEstado === estado
-                                                ? "bg-gradient-to-r from-emerald-500 to-green-500 text-white ring-emerald-400 shadow-lg shadow-emerald-500/30"
-                                                : "bg-gradient-to-r from-white/10 to-white/5 text-white/80 hover:text-white ring-white/20 hover:ring-white/40 hover:bg-white/20"
-                                        }`}
-                                    >
-                                        {estado}
-                                    </motion.button>
-                                ))}
+                        <div className="space-y-4">
+                            <div>
+                                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-white/45">
+                                    Buscar
+                                </label>
+                                <input
+                                    value={q}
+                                    onChange={(e) => setQ(e.target.value)}
+                                    placeholder="Nombre, estado o categoría..."
+                                    className="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-2.5 text-sm text-white placeholder:text-white/35 outline-none focus:border-violet-400/40"
+                                />
                             </div>
-                        </CardContent>
-                    </Card>
-                </motion.div>
 
-                {/* Listado */}
-                <motion.div
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.6 }}
-                >
+                            <div>
+                                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-white/45">
+                                    Categoría
+                                </label>
+                                <Select value={categoriaFiltro} onValueChange={setCategoriaFiltro}>
+                                    <SelectTrigger className="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-2.5 text-sm text-white outline-none focus:border-violet-400/40">
+                                        <SelectValue placeholder="Todas" />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-black/95 border-white/20 text-white">
+                                        <SelectItem value="todas" className="bg-black/80 text-white hover:bg-violet-500/20 hover:text-violet-200 focus:bg-violet-500/30 focus:text-violet-100">Todas</SelectItem>
+                                        {categoriasDisponibles.map((cat) => (
+                                            <SelectItem key={cat} value={cat} className="bg-black/80 text-white hover:bg-violet-500/20 hover:text-violet-200 focus:bg-violet-500/30 focus:text-violet-100">
+                                                {cat}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div>
+                                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-white/45">
+                                    Estado
+                                </label>
+                                <Select value={estadoFiltro} onValueChange={setEstadoFiltro}>
+                                    <SelectTrigger className="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-2.5 text-sm text-white outline-none focus:border-violet-400/40">
+                                        <SelectValue placeholder="Todos" />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-black/95 border-white/20 text-white">
+                                        <SelectItem value="todos" className="bg-black/80 text-white hover:bg-violet-500/20 hover:text-violet-200 focus:bg-violet-500/30 focus:text-violet-100">Todos</SelectItem>
+                                        <SelectItem value="ACTIVA" className="bg-black/80 text-white hover:bg-violet-500/20 hover:text-violet-200 focus:bg-violet-500/30 focus:text-violet-100">Activa</SelectItem>
+                                        <SelectItem value="PROGRAMADA" className="bg-black/80 text-white hover:bg-violet-500/20 hover:text-violet-200 focus:bg-violet-500/30 focus:text-violet-100">Programada</SelectItem>
+                                        <SelectItem value="INACTIVA" className="bg-black/80 text-white hover:bg-violet-500/20 hover:text-violet-200 focus:bg-violet-500/30 focus:text-violet-100">Inactiva</SelectItem>
+                                        <SelectItem value="FINALIZADA" className="bg-black/80 text-white hover:bg-violet-500/20 hover:text-violet-200 focus:bg-violet-500/30 focus:text-violet-100">Finalizada</SelectItem>
+                                        <SelectItem value="CANCELADA" className="bg-black/80 text-white hover:bg-violet-500/20 hover:text-violet-200 focus:bg-violet-500/30 focus:text-violet-100">Cancelada</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={limpiarFiltros}
+                                className="w-full rounded-2xl border-white/10 bg-white/5 text-white hover:bg-white/10"
+                            >
+                                Limpiar filtros
+                            </Button>
+                        </div>
+                    </aside>
+
+                    <section>
                     {/* Total de subastas */}
                     <div className="mb-6">
                         <p className="text-lg font-bold text-white/90">
@@ -202,9 +231,9 @@ export function SubastaList({ onCreate, onEdit, onViewDetail, onPublish, onCance
                                 const imgSrc = imgName ? `${API_UPLOADS}/${imgName}` : "";
 
                                 const pujasCount = Number(s?.cantidadPujas ?? s?.cantidadTotalPujas ?? 0);
-                                const canEdit = s.estado === "INACTIVA" && pujasCount === 0;
+                                const canEdit = (s.estado === "INACTIVA" || s.estado === "PROGRAMADA") && pujasCount === 0;
                                 const canPublish = s.estado === "INACTIVA";
-                                const canCancel = s.estado === "INACTIVA";
+                                const canCancel = s.estado === "INACTIVA" || s.estado === "PROGRAMADA";
 
                                 return (
                                     <motion.div
@@ -325,7 +354,8 @@ export function SubastaList({ onCreate, onEdit, onViewDetail, onPublish, onCance
                             })}
                         </div>
                     )}
-                </motion.div>
+                    </section>
+                </div>
             </div>
         </div>
     );
