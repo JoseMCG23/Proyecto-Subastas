@@ -121,16 +121,18 @@ export function FunkoUpdate() {
                     FunkoService.getFunkoById(id),
                 ]);
 
-                setDataCategorias(categoriasRes.data.data || []);
+                const categoriasLista = categoriasRes.data?.data || [];
+                setDataCategorias(categoriasLista);
 
                 const payload = funkoRes.data?.data ?? funkoRes.data;
                 setFunkoActual(payload);
+
                 const categoriasIds = Array.isArray(payload?.categorias)
                     ? payload.categorias
                         .map((c) => {
                             if (typeof c === "object" && c?.idCategoria) return c.idCategoria;
 
-                            const encontrada = dataCategorias.find(
+                            const encontrada = categoriasLista.find(
                                 (cat) => String(cat.nombre).toLowerCase() === String(c).toLowerCase()
                             );
 
@@ -139,17 +141,29 @@ export function FunkoUpdate() {
                         .filter(Boolean)
                     : [];
 
+                const imagenPortada = payload?.imagen_portada ?? "";
+
+                const otrasImagenes = Array.isArray(payload?.imagenes)
+                    ? payload.imagenes
+                        .map((img) =>
+                            typeof img === "string"
+                                ? img
+                                : img?.urlImagen ?? img?.url ?? ""
+                        )
+                        .filter(Boolean)
+                    : [];
+
+                const imagenesOrdenadas = [
+                    ...(imagenPortada ? [imagenPortada] : []),
+                    ...otrasImagenes.filter((img) => img !== imagenPortada),
+                ];
+
+                const imagenesUnicas = [...new Set(imagenesOrdenadas)];
+
                 const imagenesIniciales =
-                    Array.isArray(payload?.imagenes) && payload.imagenes.length > 0
-                        ? payload.imagenes.map((img) => ({
-                            urlImagen:
-                                typeof img === "string"
-                                    ? img
-                                    : img?.urlImagen ?? img?.url ?? "",
-                        }))
-                        : payload?.imagen_portada
-                            ? [{ urlImagen: payload.imagen_portada }]
-                            : [{ urlImagen: "" }];
+                    imagenesUnicas.length > 0
+                        ? imagenesUnicas.map((img) => ({ urlImagen: img }))
+                        : [{ urlImagen: "" }];
 
                 const previewInicial = imagenesIniciales
                     .map((img) => img.urlImagen)

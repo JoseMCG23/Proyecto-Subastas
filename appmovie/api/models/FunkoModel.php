@@ -8,7 +8,7 @@ class FunkoModel
         $this->enlace = new MySqlConnect();
     }
 
-   
+
     private function getNombreDueno($idUsuario)
     {
         $sql = "SELECT nombre, apellido FROM Usuario WHERE id=$idUsuario;";
@@ -64,10 +64,25 @@ class FunkoModel
             $f = $r[0];
 
             $f->categorias = $catM->getCategoriasFunko($f->idFunko);
-            $f->imagenes   = $imgM->getImagenesFunko($f->idFunko);
+            $imagenes = $imgM->getImagenesFunko($f->idFunko);
+
+            $ordenadas = [];
+            if (!empty($f->imagen_portada)) {
+                $ordenadas[] = $f->imagen_portada;
+            }
+
+            if (!empty($imagenes) && is_array($imagenes)) {
+                foreach ($imagenes as $img) {
+                    if ($img !== $f->imagen_portada) {
+                        $ordenadas[] = $img;
+                    }
+                }
+            }
+
+            $f->imagenes = $ordenadas;
             $f->propietario = $this->getNombreDueno($f->vendedor_id);
 
-           
+
             $sqlSub = "SELECT idsubasta, fechaInicio, fechafin, estado
                        FROM subasta
                        WHERE funko_id=$id
@@ -122,7 +137,7 @@ class FunkoModel
         return $this->get($idFunko);
     }
 
- 
+
 
     /**
      * Actualizar funko

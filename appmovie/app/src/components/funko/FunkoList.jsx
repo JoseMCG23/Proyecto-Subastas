@@ -9,7 +9,8 @@ const imgUrl = (name) =>
 
 const chipBase =
     "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-white/10";
-
+const selectClass =
+    "w-full appearance-none rounded-2xl border border-white/10 bg-zinc-950 px-4 py-2.5 text-sm text-white outline-none transition focus:border-violet-400/40 focus:ring-2 focus:ring-violet-500/20";
 function EstadoChip({ estado }) {
     const value = String(estado ?? "").toLowerCase();
 
@@ -170,7 +171,7 @@ export default function FunkoList() {
                                 value={q}
                                 onChange={(e) => setQ(e.target.value)}
                                 placeholder="Nombre, categoría o estado..."
-                                className="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-2.5 text-sm text-white placeholder:text-white/35 outline-none focus:border-violet-400/40"
+                                className={selectClass}
                             />
                         </div>
 
@@ -181,11 +182,17 @@ export default function FunkoList() {
                             <select
                                 value={categoriaFiltro}
                                 onChange={(e) => setCategoriaFiltro(e.target.value)}
-                                className="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-2.5 text-sm text-white outline-none focus:border-violet-400/40"
+                                className={selectClass}
                             >
-                                <option value="todas">Todas</option>
+                                <option value="todas" style={{ backgroundColor: "#18181b", color: "#ffffff" }}>
+                                    Todas
+                                </option>
                                 {categoriasDisponibles.map((cat) => (
-                                    <option key={cat} value={cat}>
+                                    <option
+                                        key={cat}
+                                        value={cat}
+                                        style={{ backgroundColor: "#18181b", color: "#ffffff" }}
+                                    >
                                         {cat}
                                     </option>
                                 ))}
@@ -199,13 +206,23 @@ export default function FunkoList() {
                             <select
                                 value={estadoFiltro}
                                 onChange={(e) => setEstadoFiltro(e.target.value)}
-                                className="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-2.5 text-sm text-white outline-none focus:border-violet-400/40"
+                                className={selectClass}
                             >
-                                <option value="todos">Todos</option>
-                                <option value="activo">Activo</option>
-                                <option value="disponible">Disponible</option>
-                                <option value="inactivo">Inactivo</option>
-                                <option value="eliminado">Eliminado</option>
+                                <option value="todos" style={{ backgroundColor: "#18181b", color: "#ffffff" }}>
+                                    Todos
+                                </option>
+                                <option value="activo" style={{ backgroundColor: "#18181b", color: "#ffffff" }}>
+                                    Activo
+                                </option>
+                                <option value="disponible" style={{ backgroundColor: "#18181b", color: "#ffffff" }}>
+                                    Programada
+                                </option>
+                                <option value="inactivo" style={{ backgroundColor: "#18181b", color: "#ffffff" }}>
+                                    Inactivo
+                                </option>
+                                <option value="eliminado" style={{ backgroundColor: "#18181b", color: "#ffffff" }}>
+                                    Eliminado
+                                </option>
                             </select>
                         </div>
 
@@ -216,11 +233,17 @@ export default function FunkoList() {
                             <select
                                 value={condicionFiltro}
                                 onChange={(e) => setCondicionFiltro(e.target.value)}
-                                className="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-2.5 text-sm text-white outline-none focus:border-violet-400/40"
+                                className={selectClass}
                             >
-                                <option value="todas">Todas</option>
-                                <option value="nuevo">Nuevo</option>
-                                <option value="usado">Usado</option>
+                                <option value="todas" style={{ backgroundColor: "#18181b", color: "#ffffff" }}>
+                                    Todas
+                                </option>
+                                <option value="nuevo" style={{ backgroundColor: "#18181b", color: "#ffffff" }}>
+                                    Nuevo
+                                </option>
+                                <option value="usado" style={{ backgroundColor: "#18181b", color: "#ffffff" }}>
+                                    Usado
+                                </option>
                             </select>
                         </div>
 
@@ -231,14 +254,19 @@ export default function FunkoList() {
                             <select
                                 value={editabilidadFiltro}
                                 onChange={(e) => setEditabilidadFiltro(e.target.value)}
-                                className="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-2.5 text-sm text-white outline-none focus:border-violet-400/40"
+                                className={selectClass}
                             >
-                                <option value="todos">Todos</option>
-                                <option value="editables">Solo editables</option>
-                                <option value="no_editables">Solo no editables</option>
+                                <option value="todos" style={{ backgroundColor: "#18181b", color: "#ffffff" }}>
+                                    Todos
+                                </option>
+                                <option value="editables" style={{ backgroundColor: "#18181b", color: "#ffffff" }}>
+                                    Solo editables
+                                </option>
+                                <option value="no_editables" style={{ backgroundColor: "#18181b", color: "#ffffff" }}>
+                                    Solo no editables
+                                </option>
                             </select>
                         </div>
-
                         <Button
                             type="button"
                             variant="outline"
