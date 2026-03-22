@@ -5,23 +5,29 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
+// import UsuarioService from "@/services/UsuarioService";
+
+
 
 //validaciones
 const subastaSchema = yup.object({
-    funko_id: yup.number().required("Debe seleccionar un objeto"),
-    usuario_id: yup.number().required("Debe seleccionar un usuario vendedor"),
+    funko_id: yup.number()
+    .transform((value, originalValue) => originalValue === "" ? null : value)
+    .required("Debe seleccionar un objeto"),
     fechaInicio: yup.string().required("La fecha de inicio es requerida"),
     horaInicio: yup.string().required("La hora de inicio es requerida"),
     fechafin: yup.string().required("La fecha de cierre es requerida"),
     horaFin: yup.string().required("La hora de cierre es requerida"),
     precioBase: yup
-        .number()
-        .required("El precio base es requerido")
-        .positive("El precio base debe ser mayor a 0"),
+    .number()
+    .transform((value, originalValue) => originalValue === "" ? null : value)
+    .required("El precio base es requerido")
+    .positive("El precio base debe ser mayor a 0"),
     incre_minimo: yup
-        .number()
-        .required("El incremento mínimo es requerido")
-        .positive("El incremento mínimo debe ser mayor a 0"),
+    .number()
+    .transform((value, originalValue) => originalValue === "" ? null : value)
+    .required("El incremento mínimo es requerido")
+    .positive("El incremento mínimo debe ser mayor a 0"),
 });
 
 const subastaLimitedSchema = yup.object({
@@ -43,7 +49,7 @@ export function SubastaForm({
     onSubmit,
     onCancel,
     funkos,
-    usuarios,
+    usuario,
     isEditing,
     isLoading,
     subasta,
@@ -59,7 +65,6 @@ export function SubastaForm({
     } = useForm({
         defaultValues: {
             funko_id: subasta?.funko_id || "",
-            usuario_id: subasta?.usuario_id || subasta?.vendedor_id || "",
             fechaInicio: subasta?.fechaInicio?.split(" ")[0] || "",
             horaInicio: subasta?.fechaInicio?.split(" ")[1]?.substring(0, 5) || "",
             fechafin: subasta?.fechafin?.split(" ")[0] || "",
@@ -73,7 +78,6 @@ export function SubastaForm({
     useEffect(() => {
         reset({
             funko_id: subasta?.funko_id || "",
-            usuario_id: subasta?.usuario_id || subasta?.vendedor_id || "",
             fechaInicio: subasta?.fechaInicio?.split(" ")[0] || "",
             horaInicio: subasta?.fechaInicio?.split(" ")[1]?.substring(0, 5) || "",
             fechafin: subasta?.fechafin?.split(" ")[0] || "",
@@ -197,39 +201,16 @@ export function SubastaForm({
                                 transition={{ delay: 0.4 }}
                             >
                                 <label className="block text-sm font-bold text-white mb-3">
-                                    Vendedor *
+                                    Vendedor
                                 </label>
-                                <Controller
-                                    name="usuario_id"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <select
-                                            {...field}
-                                            disabled={isEditing}
-                                            className={`w-full rounded-xl border px-4 py-3 text-white bg-gradient-to-r from-white/10 to-white/5 placeholder:text-white/40 transition-all duration-200 hover:border-blue-400/50 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 ${
-                                                errors.usuario_id ? "border-red-500/50 focus:border-red-500" : "border-white/20"
-                                            } ${isEditing ? "opacity-60 cursor-not-allowed" : ""}`}
-                                        >
-                                            <option value="" className="bg-neutral-800">Selecciona un vendedor</option>
-                                            {usuarios
-                                                .filter((u) => u.rol?.toLowerCase() === "vendedor" || u.rol?.toLowerCase() === "vendor")
-                                                .map((u) => (
-                                                    <option key={u.id} value={u.id} className="bg-neutral-800">
-                                                        {u.nombreCompleto || `${u.nombre} ${u.apellido}`}
-                                                    </option>
-                                                ))}
-                                        </select>
-                                    )}
+
+                                <input
+
+                                
+                                    value={usuario?.nombreCompleto || "Cargando..."}
+                                    disabled
+                                    className="w-full rounded-xl border px-4 py-3 text-white bg-white/10 border-white/20 opacity-70 cursor-not-allowed"
                                 />
-                                {errors.usuario_id && (
-                                    <motion.p
-                                        initial={{ opacity: 0, y: -10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        className="text-xs text-red-400 mt-2"
-                                    >
-                                        {errors.usuario_id.message}
-                                    </motion.p>
-                                )}
                             </motion.div>
                         )}
 

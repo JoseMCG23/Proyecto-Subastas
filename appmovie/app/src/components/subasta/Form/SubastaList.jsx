@@ -326,7 +326,7 @@ export function SubastaList({ onCreate, onEdit, onViewDetail, onPublish, onCance
                                                     <motion.button
                                                         whileHover={{ scale: 1.05 }}
                                                         whileTap={{ scale: 0.95 }}
-                                                        onClick={() => onPublish(s.idsubasta)}
+                                                        onClick={() => onPublish(s)}
                                                         disabled={isLoading}
                                                         className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500/20 to-green-500/20 hover:from-emerald-500/30 hover:to-green-500/30 text-emerald-300 hover:text-emerald-200 text-sm font-semibold py-3 transition-all duration-200 border border-emerald-500/30 hover:border-emerald-400/50 disabled:opacity-50"
                                                         title="Publicar"

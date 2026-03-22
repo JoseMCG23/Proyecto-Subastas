@@ -28,13 +28,22 @@ export function MantenimientoSubasta() {
         setShowDetail(true);
     };
 
-    const handlePublish = async (idSubasta) => {
-        if (!idSubasta) {
+    const handlePublish = async (subasta) => {
+        if (!subasta?.idsubasta) {
             toast.error('ID de subasta no disponible');
             return;
         }
+
+        const ahora = new Date();
+        const fechaInicio = new Date(subasta.fechaInicio);
+
+        if (fechaInicio <= ahora) {
+            toast.error("No se puede publicar: la fecha de inicio ya pasó o no es válida");
+            return;
+        }
+
         try {
-            await SubastaService.publicarSubasta(idSubasta);
+            await SubastaService.publicarSubasta(subasta.idsubasta);
             toast.success("Subasta publicada exitosamente");
             setRefreshKey(prev => prev + 1);
         } catch (err) {

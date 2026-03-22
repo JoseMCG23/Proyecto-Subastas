@@ -8,7 +8,7 @@ import { SubastaForm } from "./SubastaForm";
 
 export function SubastaCreate({ onClose, onSuccess }) {
     const [funkos, setFunkos] = useState([]);
-    const [usuarios, setUsuarios] = useState([]);
+    const [usuario, setUsuario] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
@@ -26,8 +26,10 @@ export function SubastaCreate({ onClose, onSuccess }) {
                 const funkosDisponibles = funkosList.filter((f) => {
                     if (f.estado !== "DISPONIBLE") return false;
 
-                    const estaEnSubasta = subastasList.some((s) => s.funko_id === f.idFunko);
-                    return !estaEnSubasta;
+                    const estaEnSubastaActiva = subastasList.some(
+                    (s) => s.funko_id === f.idFunko && s.estado === "ACTIVA"
+                    );
+                    return !estaEnSubastaActiva;
                 });
 
                 setFunkos(funkosDisponibles);
@@ -35,7 +37,12 @@ export function SubastaCreate({ onClose, onSuccess }) {
                 // Cargar usuarios vendedores
                 const usuariosRes = await UsuarioService.getUsuarios();
                 const usuariosList = usuariosRes.data.data || usuariosRes.data || [];
-                setUsuarios(Array.isArray(usuariosList) ? usuariosList : []);
+
+                
+                const vendedor = usuariosList.find(u => u.id === "4");
+                setUsuario(vendedor || null);
+
+
             } catch (err) {
                 console.error(err);
                 toast.error("Error al cargar los datos");
@@ -51,9 +58,8 @@ export function SubastaCreate({ onClose, onSuccess }) {
 
             const payload = {
                 ...data,
-                vendedor_id: data.usuario_id,
-                usuario_id: undefined,
-                estado: "INACTIVA", // Crear siempre como INACTIVA
+                vendedor_id: usuario?.id,
+                estado: "INACTIVA",
             };
 
             await SubastaService.createSubasta(payload);
@@ -69,13 +75,14 @@ export function SubastaCreate({ onClose, onSuccess }) {
         }
     };
 
+    
     return (
         <AnimatePresence>
             <SubastaForm
                 onSubmit={handleSubmit}
                 onCancel={onClose}
                 funkos={funkos}
-                usuarios={usuarios}
+                usuario={usuario}
                 isEditing={false}
                 isLoading={isLoading}
                 subasta={null}

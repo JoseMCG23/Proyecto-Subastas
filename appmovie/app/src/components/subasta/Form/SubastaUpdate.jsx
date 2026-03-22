@@ -2,13 +2,13 @@ import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import SubastaService from "@/services/SubastaService";
 import FunkoService from "@/services/FunkoService";
-import UsuarioService from "@/services/UsuarioService";
+// import UsuarioService from "@/services/UsuarioService";
 import toast from "react-hot-toast";
 import { SubastaForm } from "./SubastaForm";
 
 export function SubastaUpdate({ subasta, onClose, onSuccess }) {
     const [funkos, setFunkos] = useState([]);
-    const [usuarios, setUsuarios] = useState([]);
+    // const [usuarios, setUsuarios] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
@@ -19,10 +19,10 @@ export function SubastaUpdate({ subasta, onClose, onSuccess }) {
                 const funkosList = funkosRes.data.data || funkosRes.data || [];
                 setFunkos(Array.isArray(funkosList) ? funkosList : []);
 
-                // Cargar usuarios vendedores
-                const usuariosRes = await UsuarioService.getUsuarios();
-                const usuariosList = usuariosRes.data.data || usuariosRes.data || [];
-                setUsuarios(Array.isArray(usuariosList) ? usuariosList : []);
+                // // Cargar usuarios vendedores
+                // const usuariosRes = await UsuarioService.getUsuarios();
+                // const usuariosList = usuariosRes.data.data || usuariosRes.data || [];
+                // setUsuarios(Array.isArray(usuariosList) ? usuariosList : []);
             } catch (err) {
                 console.error(err);
                 toast.error("Error al cargar los datos");
@@ -33,7 +33,10 @@ export function SubastaUpdate({ subasta, onClose, onSuccess }) {
     }, []);
 
     const pujasCount = Number(subasta?.cantidadPujas ?? subasta?.cantidadTotalPujas ?? 0);
-    const canEditSubasta = (subasta?.estado === "INACTIVA" || subasta?.estado === "PROGRAMADA") && pujasCount === 0;
+    const canEditSubasta =
+    (subasta?.estado === "INACTIVA" || subasta?.estado === "PROGRAMADA") &&
+    pujasCount === 0 &&
+    new Date(subasta?.fechaInicio) > new Date();
 
     const handleSubmit = async (data) => {
         try {
@@ -42,7 +45,7 @@ export function SubastaUpdate({ subasta, onClose, onSuccess }) {
             const payload = {
                 idsubasta: subasta.idsubasta,
                 funko_id: data.funko_id ?? subasta.funko_id,
-                vendedor_id: data.usuario_id ?? subasta.usuario_id ?? subasta.vendedor_id,
+                // vendedor_id: data.usuario_id ?? subasta.usuario_id ?? subasta.vendedor_id,
                 fechaInicio: data.fechaInicio,
                 fechafin: data.fechafin,
                 precioBase: data.precioBase,
@@ -69,7 +72,7 @@ export function SubastaUpdate({ subasta, onClose, onSuccess }) {
                     <div className="max-w-md w-full rounded-2xl border border-white/20 bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 p-6 shadow-2xl">
                         <h3 className="text-xl font-bold text-white">Edición no permitida</h3>
                         <p className="mt-3 text-sm text-white/70">
-                            La subasta solo puede editarse si está programada, y no tiene pujas.
+                            La subasta solo puede editarse si está programada, y/o no tiene pujas.
                         </p>
                         <div className="mt-6 text-right">
                             <button
@@ -91,7 +94,7 @@ export function SubastaUpdate({ subasta, onClose, onSuccess }) {
                 onSubmit={handleSubmit}
                 onCancel={onClose}
                 funkos={funkos}
-                usuarios={usuarios}
+                // usuarios={usuarios}
                 isEditing={true}
                 isLoading={isLoading}
                 subasta={subasta}
