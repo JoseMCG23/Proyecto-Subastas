@@ -141,31 +141,58 @@ class SubastaModel {
     //Crear subasta
     public function create($objeto)
     {
+        error_log("SubastaModel::create - Iniciando validaciones");
+        error_log("Fecha inicio: " . $objeto->fechaInicio);
+        error_log("Fecha fin: " . $objeto->fechafin);
+        error_log("Precio base: " . $objeto->precioBase);
+        error_log("Incremento: " . $objeto->incre_minimo);
+
+        // Fecha de inicio debe ser en el futuro
+        if (strtotime($objeto->fechaInicio) <= time()) {
+            error_log("ERROR: Fecha de inicio en el pasado");
+            throw new Exception("La fecha de inicio debe ser en el futuro");
+        }
+
         // Fecha cierre > fecha inicio
         if (strtotime($objeto->fechafin) <= strtotime($objeto->fechaInicio)) {
+            error_log("ERROR: Fecha de fin <= fecha de inicio");
             throw new Exception("La fecha de cierre debe ser mayor a la de inicio");
         }
 
         //Precio base > 0
         if ($objeto->precioBase <= 0) {
+            error_log("ERROR: Precio base <= 0");
             throw new Exception("El precio base debe ser mayor a 0");
         }
 
         //Incremento mínimo > 0
         if ($objeto->incre_minimo <= 0) {
+            error_log("ERROR: Incremento <= 0");
             throw new Exception("El incremento mínimo debe ser mayor a 0");
         }
 
-        
+
         //El objeto (funko)no puede tener otra subasta activa
-        $sql = "SELECT idsubasta FROM subasta 
-                WHERE funko_id = $objeto->funko_id 
+        $sql = "SELECT idsubasta FROM subasta
+                WHERE funko_id = $objeto->funko_id
                 AND estado = 'ACTIVA';";
         $r = $this->enlace->executeSQL($sql);
 
         if (!empty($r)) {
+            error_log("ERROR: Funko tiene subasta activa");
             throw new Exception("El funko ya tiene una subasta activa");
         }
+
+        // El objeto (funko) debe estar activo
+        $sql = "SELECT estado FROM Funko WHERE idFunko = $objeto->funko_id;";
+        $r = $this->enlace->executeSQL($sql);
+
+        if (empty($r) || $r[0]->estado != 'DISPONIBLE') {
+            error_log("ERROR: Funko no disponible");
+            throw new Exception("El funko no está disponible");
+        }
+
+        error_log("Todas las validaciones pasaron, creando subasta...");
 
         // El objeto (funko) debe estar activo
         $sql = "SELECT estado FROM Funko WHERE idFunko = $objeto->funko_id;";

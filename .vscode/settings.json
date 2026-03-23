@@ -1,6 +1,14 @@
 {
     "chat.tools.terminal.autoApprove": {
         "npx eslint": true,
-        "npm run dev": true
+        "npm run dev": true,
+        "/^cd \"c:\\\\Users\\\\cubil\\\\OneDrive\\\\Desktop\\\\UTN\\\\Programacion en Ambiente web\\\\Proyecto-Subastas\\\\appmovie\\\\api\" ; php -l models/SubastaModel\\.php$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^cd \"c:\\\\Users\\\\cubil\\\\OneDrive\\\\Desktop\\\\UTN\\\\Programacion en Ambiente web\\\\Proyecto-Subastas\\\\appmovie\\\\api\" ; php -r \"\n\\\\\\$fechaInicio = '2026-03-20 10:00:00';\n\\\\\\$fechaFin = '2026-03-20 09:00:00';\necho 'Fecha inicio: ' \\. \\\\\\$fechaInicio \\. PHP_EOL;\necho 'Fecha fin: ' \\. \\\\\\$fechaFin \\. PHP_EOL;\necho 'strtotime\\(fechaInicio\\): ' \\. strtotime\\(\\\\\\$fechaInicio\\) \\. PHP_EOL;\necho 'strtotime\\(fechaFin\\): ' \\. strtotime\\(\\\\\\$fechaFin\\) \\. PHP_EOL;\necho 'time\\(\\): ' \\. time\\(\\) \\. PHP_EOL;\necho 'fechaInicio <= time\\(\\): ' \\. \\(strtotime\\(\\\\\\$fechaInicio\\) <= time\\(\\) \\? 'true' : 'false'\\) \\. PHP_EOL;\necho 'fechaFin <= fechaInicio: ' \\. \\(strtotime\\(\\\\\\$fechaFin\\) <= strtotime\\(\\\\\\$fechaInicio\\) \\? 'true' : 'false'\\) \\. PHP_EOL;\n\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
     }
 }

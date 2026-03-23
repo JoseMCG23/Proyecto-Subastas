@@ -93,11 +93,31 @@ export function SubastaForm({
             const fechaInicioCompleta = `${data.fechaInicio} ${data.horaInicio}:00`;
             const fechaFinCompleta = `${data.fechafin} ${data.horaFin}:00`;
 
+            console.log('=== VALIDACIONES DE FECHA ===');
+            console.log('Fecha inicio completa:', fechaInicioCompleta);
+            console.log('Fecha fin completa:', fechaFinCompleta);
+            console.log('Fecha inicio Date:', new Date(fechaInicioCompleta));
+            console.log('Fecha fin Date:', new Date(fechaFinCompleta));
+            console.log('Ahora:', new Date());
+
+            // Validar fecha de inicio no sea en el pasado
+            if (new Date(fechaInicioCompleta) <= new Date()) {
+                console.log('❌ ERROR: Fecha de inicio en el pasado');
+                alert("ERROR: La fecha de inicio debe ser menor a la fecha de cierre");
+                toast.error("La fecha de inicio debe ser menor a la fecha de cierre");
+                return;
+            }
+
             // Valida fecha cierre > fecha inicio
             if (new Date(fechaFinCompleta) <= new Date(fechaInicioCompleta)) {
+                console.log('❌ ERROR: Fecha de fin <= fecha de inicio');
+                alert("ERROR: La fecha de cierre debe ser mayor a la de inicio");
                 toast.error("La fecha de cierre debe ser mayor a la de inicio");
                 return;
             }
+
+            console.log('✅ Validaciones pasaron, enviando...');
+            alert("Validaciones pasaron, enviando al servidor...");
 
             const payload = {
                 ...data,
@@ -108,6 +128,8 @@ export function SubastaForm({
             await onSubmit(payload);
             reset();
         } catch (error) {
+            console.error('❌ Error en handleFormSubmit:', error);
+            alert("Error: " + (error.message || "Error al procesar el formulario"));
             toast.error(error.message || "Error al procesar el formulario");
         }
     };
