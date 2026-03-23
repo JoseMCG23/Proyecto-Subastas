@@ -6,16 +6,6 @@ class UsuarioModel
     {
         $this->enlace = new MySqlConnect();
     }
-    /*Listar usuariosprueba de inicio*/
-    // public function all()
-    //{
-    //Consulta de SQL
-    //    $vSql = "Select * from usuario;";
-    //Ejecutan la consulta
-    //    $vResultado = $this->enlace->executeSQL($vSql);
-    //Retornan el resultado de la consulta
-    //return $vResultado;
-    //  }
 
     /**
      * Listar usuarios
@@ -136,7 +126,6 @@ class UsuarioModel
         if (empty($resultado)) {
             return null;
         }
-
         $estadoActual = strtoupper($resultado[0]->estado);
         $nuevoEstado = ($estadoActual == "ACTIVO") ? "INACTIVO" : "ACTIVO";
 
@@ -145,8 +134,6 @@ class UsuarioModel
             "WHERE id=$objeto->id";
 
         $cResults = $this->enlace->executeSQL_DML($sql);
-
-        // Retornar usuario actualizado
         return $this->get($objeto->id);
     }
 }

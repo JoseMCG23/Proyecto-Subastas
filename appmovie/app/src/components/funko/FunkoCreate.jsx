@@ -15,7 +15,7 @@ import ImageService from "@/services/ImageService";
 import { FunkoForm } from "@/components/funko/Form/FunkoForm";
 
 const usuarioActual = {
-    id: 2,
+    id: 4,
     nombre: "Usuario Vendedor Simulado",
 };
 

@@ -104,36 +104,30 @@ class FunkoModel
     //
     public function create($objeto)
     {
-        //Primera imagen como portada
+        // portada
         $imagenPortada = $objeto->imagenes[0];
 
-        //Consulta sql
-        //Identificador autoincrementable
         $sql = "Insert into Funko (nombre, descripcion, condicion, estado, vendedor_id, imagen_portada)" .
             " Values ('$objeto->nombre','$objeto->descripcion',
                 '$objeto->condicion','$objeto->estado',$objeto->vendedor_id,'$imagenPortada')";
 
-        //Ejecutar la consulta
-        //Obtener ultimo insert
+
+        //btenemos el último insert
         $idFunko = $this->enlace->executeSQL_DML_last($sql);
 
-        //--- Categorias ---
-        //Crear elementos a insertar en categorias
+        //CATEGORÍAS
         foreach ($objeto->categorias as $value) {
             $sql = "Insert into Funko_Categoria(funko_id,categoria_id)" .
                 " Values($idFunko,$value)";
             $vResultadoCat = $this->enlace->executeSQL_DML($sql);
         }
 
-        //--- Imagenes ---
-        //Crear elementos a insertar en imagenes
+        //IMÁGENES
         foreach ($objeto->imagenes as $item) {
             $sql = "Insert into Funko_Imagen(funko_id,urlImagen)" .
                 " Values($idFunko,'$item')";
             $vResultadoImg = $this->enlace->executeSQL_DML($sql);
         }
-
-        //Retornar funko
         return $this->get($idFunko);
     }
 
@@ -148,16 +142,15 @@ class FunkoModel
     {
         $idFunko = $objeto->idFunko;
 
-        // Regla
-        // solo se puede editar si NO está en subasta activa
+    
+        // RN 1: solo se puede editar si NO está en subasta activa
         if ($this->tieneSubastaActiva($idFunko)) {
             throw new Exception("No se puede editar el funko porque tiene una subasta activa");
         }
 
-        // Primera imagen como portada
         $imagenPortada = $objeto->imagenes[0];
 
-        // Actualizar tabla principal
+        // se actualiza la tabla principal
         $sql = "UPDATE Funko SET
                 nombre = '$objeto->nombre',
                 descripcion = '$objeto->descripcion',
@@ -168,36 +161,32 @@ class FunkoModel
 
         $this->enlace->executeSQL_DML($sql);
 
-        // --- Categorias ---
-        // Eliminar categorias actuales
+        // CATEGORÍAS
+        // delete de categorias actuales
         $sql = "DELETE FROM Funko_Categoria WHERE funko_id = $idFunko";
         $this->enlace->executeSQL_DML($sql);
 
-        // Insertar categorias nuevas
+        // insert con categorias nuevas
         foreach ($objeto->categorias as $value) {
             $sql = "INSERT INTO Funko_Categoria(funko_id, categoria_id)
                 VALUES($idFunko, $value)";
             $this->enlace->executeSQL_DML($sql);
         }
 
-        // --- Imagenes ---
-        // Eliminar imagenes actuales
+        // IMÁGENES
+        // delete imagenes actuales
         $sql = "DELETE FROM Funko_Imagen WHERE funko_id = $idFunko";
         $this->enlace->executeSQL_DML($sql);
 
-        // Insertar imagenes nuevas
+        // insert con imagenes nuevas
         foreach ($objeto->imagenes as $item) {
             $sql = "INSERT INTO Funko_Imagen(funko_id, urlImagen)
                 VALUES($idFunko, '$item')";
             $this->enlace->executeSQL_DML($sql);
         }
-
-        // Retornar funko actualizado
         return $this->get($idFunko);
     }
-    /**
-     * Verifica si el funko tiene una subasta activa
-     */
+    
     private function tieneSubastaActiva($idFunko)
     {
         $sql = "SELECT idsubasta
@@ -208,9 +197,7 @@ class FunkoModel
         return (!empty($r));
     }
 
-    /**
-     * Verifica si el funko ha sido subastado alguna vez
-     */
+   
     private function haSidoSubastado($idFunko)
     {
         $sql = "SELECT idsubasta
@@ -221,9 +208,7 @@ class FunkoModel
         return (!empty($r));
     }
 
-    /**
-     * Obtiene el estado actual del funko
-     */
+  
     private function getEstadoActual($idFunko)
     {
         $sql = "SELECT estado
