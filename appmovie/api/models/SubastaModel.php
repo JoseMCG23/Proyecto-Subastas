@@ -203,7 +203,7 @@ class SubastaModel {
     public function update($objeto)
     {
         $id = $objeto->idsubasta;
-        $sql = "SELECT fechaInicio FROM subasta WHERE idsubasta = $id;";
+        $sql = "SELECT fechaInicio, estado FROM subasta WHERE idsubasta = $id;";
         $r = $this->enlace->executeSQL($sql);
 
         if (empty($r)) {
@@ -211,9 +211,15 @@ class SubastaModel {
         }
 
         $fechaInicio = $r[0]->fechaInicio;
+        $estado = $r[0]->estado ?? null;
 
-        // Validar si no ha iniciado
-        if (strtotime($fechaInicio) <= time()) {
+        // Validar estados editables
+        if (!in_array($estado, ['INACTIVA', 'PROGRAMADA'])) {
+            throw new Exception("Solo se puede editar subasta INACTIVA o PROGRAMADA");
+        }
+
+        // Validar si no ha iniciado (solo con PROGRAMADA)
+        if ($estado === 'PROGRAMADA' && strtotime($fechaInicio) <= time()) {
             throw new Exception("No se puede editar porque la subasta ya inició");
         }
 

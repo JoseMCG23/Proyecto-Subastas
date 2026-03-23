@@ -231,7 +231,12 @@ export function SubastaList({ onCreate, onEdit, onViewDetail, onPublish, onCance
                                 const imgSrc = imgName ? `${API_UPLOADS}/${imgName}` : "";
 
                                 const pujasCount = Number(s?.cantidadPujas ?? s?.cantidadTotalPujas ?? 0);
-                                const canEdit = (s.estado === "INACTIVA" || s.estado === "PROGRAMADA") && pujasCount === 0;
+                                const inicioFecha = new Date(s?.fechaInicio);
+                                const esEditableEstado = s.estado === "INACTIVA" || s.estado === "PROGRAMADA";
+                                const aunNoInicia =
+                                    s.estado === "INACTIVA" ||
+                                    (!Number.isNaN(inicioFecha.getTime()) && inicioFecha > new Date());
+                                const canEdit = esEditableEstado && pujasCount === 0 && aunNoInicia;
                                 const canPublish = s.estado === "INACTIVA";
                                 const canCancel = s.estado === "INACTIVA" || s.estado === "PROGRAMADA";
 

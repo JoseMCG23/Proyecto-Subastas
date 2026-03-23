@@ -36,7 +36,7 @@ export function SubastaUpdate({ subasta, onClose, onSuccess }) {
     const canEditSubasta =
     (subasta?.estado === "INACTIVA" || subasta?.estado === "PROGRAMADA") &&
     pujasCount === 0 &&
-    new Date(subasta?.fechaInicio) > new Date();
+    (subasta?.estado === "INACTIVA" || new Date(subasta?.fechaInicio) > new Date());
 
     const handleSubmit = async (data) => {
         try {
@@ -69,10 +69,10 @@ export function SubastaUpdate({ subasta, onClose, onSuccess }) {
         return (
             <AnimatePresence>
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
-                    <div className="max-w-md w-full rounded-2xl border border-white/20 bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 p-6 shadow-2xl">
+                    <div className="max-w-md w-full rounded-2xl border border-white/20 bg-linear-to-br from-neutral-900 via-neutral-800 to-neutral-900 p-6 shadow-2xl">
                         <h3 className="text-xl font-bold text-white">Edición no permitida</h3>
                         <p className="mt-3 text-sm text-white/70">
-                            La subasta solo puede editarse si está programada, y/o no tiene pujas.
+                            Solo se puede editar si la subasta es INACTIVA o PROGRAMADA, no ha iniciado y no tiene pujas.
                         </p>
                         <div className="mt-6 text-right">
                             <button
