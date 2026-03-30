@@ -187,7 +187,7 @@ export default function UserList() {
                                 <TableHead className="text-white/55">Usuario</TableHead>
                                 <TableHead className="text-white/55">Rol</TableHead>
                                 <TableHead className="text-white/55">Estado</TableHead>
-                                <TableHead className="text-right text-white/55">Acciones</TableHead>
+                                <TableHead className="text-right text-white/55"></TableHead>
                             </TableRow>
                         </TableHeader>
 

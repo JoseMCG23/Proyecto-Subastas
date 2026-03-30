@@ -2,15 +2,14 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #ffffff;
   --foreground: #111827;
-  /* gris oscuro */
   --card: #ffffff;
   --card-foreground: #111827;
 
   --muted: #f3f4f6;
-  /* gris muy clarito */
   --muted-foreground: #6b7280;
 
   --border: #e5e7eb;
@@ -18,14 +17,11 @@
   --ring: #111827;
 
   --primary: #111827;
-  /* negro */
   --primary-foreground: #ffffff;
 
   --secondary: #374151;
-  /* gris */
   --secondary-foreground: #ffffff;
 }
-
 
 @theme inline {
   --color-background: var(--background);
@@ -77,6 +73,47 @@
   --shadow-lg: var(--shadow-lg);
   --shadow-xl: var(--shadow-xl);
   --shadow-2xl: var(--shadow-2xl);
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(calc(-50% - 10px));
+  }
+}
+
+.animate-marquee {
+  animation: marquee 28s linear infinite;
+}
+
+.animate-marquee-slow {
+  animation: marquee 34s linear infinite;
+}
+
+.fade-up {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.fade-up.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 @layer base {
   body {

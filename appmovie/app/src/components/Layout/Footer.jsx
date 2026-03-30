@@ -1,33 +1,40 @@
+import { Link } from "react-router-dom";
+import logo from "@/assets/logo2.webp";
+
 export function Footer() {
   return (
-    <footer className="border-t border-white/10 bg-neutral-950/60 backdrop-blur">
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-6 py-10 md:grid-cols-4">
-        <div>
-          <p className="text-sm font-semibold">SubastasFunko</p>
-          <p className="mt-2 text-sm text-white/60">
-            Marketplace de subastas de Funko Pop para coleccionistas.
-          </p>
-          <p className="mt-4 text-xs text-white/40">© {new Date().getFullYear()} ISW-613</p>
-        </div>
+    <footer className="border-t border-white/10 bg-[#1f1f1f]">
+      <div className="mx-auto flex max-w-7xl flex-col items-center justify-center px-6 py-5 text-center">
 
-        <div>
-          <p className="text-sm font-semibold">Marketplace</p>
-          <ul className="mt-3 space-y-2 text-sm text-white/60">
-            <li>Explorar</li>
-            <li>Vender</li>
-            <li>Tendencias</li>
-          </ul>
-        </div>
+        {/* Logo */}
+        <Link to="/" className="mb-2">
+          <img
+            src={logo}
+            alt="SubastasFunko"
+            className="h-10 w-auto object-contain opacity-95"
+          />
+        </Link>
 
-        <div>
-          <p className="text-sm font-semibold">Soporte</p>
-          <ul className="mt-3 space-y-2 text-sm text-white/60">
-            <li>Centro de ayuda</li>
-            <li>Guía del comprador</li>
-            <li>Contacto</li>
-          </ul>
-        </div>
+        {/* Links */}
+        <nav className="flex flex-wrap items-center justify-center gap-x-5 text-sm text-sky-400">
+          <Link to="/subastas" className="hover:text-sky-300 transition">
+            Explorar
+          </Link>
+          <Link to="/funkos" className="hover:text-sky-300 transition">
+            Colección
+          </Link>
+          <Link to="/user/create" className="hover:text-sky-300 transition">
+            Registrarse
+          </Link>
+          <Link to="/user/login" className="hover:text-sky-300 transition">
+            Iniciar sesión
+          </Link>
+        </nav>
 
+        {}
+        <p className="mt-2 text-xs text-white/40">
+          © {new Date().getFullYear()} SubastasFunko
+        </p>
 
       </div>
     </footer>
