@@ -7,9 +7,9 @@ import {
     CircleCheckBig,
     Ban,
     ShieldCheck,
-   
+
     ChevronRight,
-    Mail,
+
 } from "lucide-react";
 
 function StatusBadge({ value }) {
@@ -76,7 +76,7 @@ function getInitials(name) {
 function UserCard({ user }) {
     const id = user.idUsuario ?? user.id ?? user.id_usuario;
     const nombre = user.nombreCompleto ?? "Usuario";
-    const correo = user.correo ?? user.email;
+
     const initials = getInitials(nombre);
 
     return (
@@ -101,11 +101,11 @@ function UserCard({ user }) {
                                 {nombre}
                             </Link>
 
-                            
+
                         </div>
 
                         <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-white/50">
-                           
+
                         </div>
 
                         <div className="mt-4 flex flex-wrap items-center gap-2">
