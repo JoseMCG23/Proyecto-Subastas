@@ -7,9 +7,7 @@ import {
     CircleCheckBig,
     Ban,
     ShieldCheck,
-
     ChevronRight,
-
 } from "lucide-react";
 
 function StatusBadge({ value }) {
@@ -76,7 +74,6 @@ function getInitials(name) {
 function UserCard({ user }) {
     const id = user.idUsuario ?? user.id ?? user.id_usuario;
     const nombre = user.nombreCompleto ?? "Usuario";
-
     const initials = getInitials(nombre);
 
     return (
@@ -100,12 +97,9 @@ function UserCard({ user }) {
                             >
                                 {nombre}
                             </Link>
-
-
                         </div>
 
                         <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-white/50">
-
                         </div>
 
                         <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -198,7 +192,6 @@ export default function UserList() {
     return (
         <div className="mx-auto w-full max-w-7xl px-4 pb-10 pt-8">
             <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
-                {/* PANEL IZQUIERDO */}
                 <aside className="xl:sticky xl:top-24 xl:self-start">
                     <div className="overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-white/[0.06] via-white/[0.03] to-violet-500/[0.06] p-6 shadow-2xl shadow-violet-900/10">
                         <div className="absolute" />
@@ -253,7 +246,6 @@ export default function UserList() {
                     </div>
                 </aside>
 
-                {/* LISTADO DERECHO */}
                 <section className="space-y-4">
                     <div className="flex items-end justify-between border-b border-white/10 pb-4">
                         <div>
