@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
-
+import Pusher from "pusher-js";
 const baseUrl = import.meta.env.VITE_BASE_URL.replace(/\/$/, "");
 const HERO_IMG = `${baseUrl}/uploads/Portada.jpg`;
 
@@ -45,7 +45,25 @@ function useScrollAnimation() {
 
 export function Home() {
   useScrollAnimation();
+  useEffect(() => {
 
+    const pusher = new Pusher(import.meta.env.VITE_PUSHER_KEY, {
+      cluster: import.meta.env.VITE_PUSHER_CLUSTER
+    });
+
+    const channel = pusher.subscribe("subasta-canal");
+
+    channel.bind("evento-prueba", function (data) {
+      console.log("Evento recibido:", data);
+
+    });
+
+    return () => {
+      channel.unbind_all();
+      channel.unsubscribe();
+    };
+
+  }, []);
   return (
     <div className="w-full pb-16">
       {/* hero grande */}
