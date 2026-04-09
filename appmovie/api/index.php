@@ -28,6 +28,8 @@ require_once "models/imageModel.php";
 require_once "models/FunkoModel.php";
 require_once "models/FunkoImagenModel.php";
 require_once "models/FunkoCategoriaModel.php";
+require_once "models/ResultadoSubastaModel.php";
+require_once "models/PagoModel.php";
 
 /***--- Agregar todos los controladores*/
 
@@ -37,6 +39,8 @@ require_once "controllers/subasta.php";
 require_once "controllers/puja.php";
 require_once 'controllers/categoria.php';
 require_once "controllers/image.php";
+require_once "controllers/resultadoSubasta.php";
+require_once "controllers/pago.php";
 //Enrutador
 require_once "routes/RoutesController.php";
 $index = new RoutesController();

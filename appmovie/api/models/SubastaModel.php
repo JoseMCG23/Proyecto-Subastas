@@ -326,4 +326,6 @@ class SubastaModel {
 
         throw new Exception("No se puede cancelar la subasta");
     }
+
+    
 }
