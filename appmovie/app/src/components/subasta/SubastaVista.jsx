@@ -6,8 +6,9 @@ import SubastaService from "@/services/SubastaService";
 
 const API_UPLOADS = "http://localhost:81/appmovie/api/uploads";
 
-// variable lógica interna para pruebas
-const usuarioActualId = 6;
+// variable pruebas 6= saray 5=abraham
+const usuarioActualId = 6 
+    ;
 
 export function SubastaVista() {
     const { id } = useParams();
@@ -15,6 +16,7 @@ export function SubastaVista() {
     const [resultadoCierre, setResultadoCierre] = useState(null);
     const [montoPuja, setMontoPuja] = useState("");
     const [isSubmittingPuja, setIsSubmittingPuja] = useState(false);
+    const [isConfirmandoPago, setIsConfirmandoPago] = useState(false);
 
     const cargarSubasta = async () => {
         try {
@@ -82,6 +84,8 @@ export function SubastaVista() {
 
     const subastaCerrada = estado === "FINALIZADA" || estado === "CANCELADA";
     const puedePujar = estado === "ACTIVA";
+    const pagoPendiente = pago?.estado === "Pendiente";
+    const pagoConfirmado = pago?.estado === "Confirmado";
 
     const handlePujar = async (e) => {
         e.preventDefault();
@@ -119,6 +123,44 @@ export function SubastaVista() {
             );
         } finally {
             setIsSubmittingPuja(false);
+        }
+    };
+
+    const handleConfirmarPago = async () => {
+        if (!pago?.idPago) {
+            toast.error("No se encontró el pago asociado");
+            return;
+        }
+
+        try {
+            setIsConfirmandoPago(true);
+
+            await SubastaService.confirmarPago(pago.idPago);
+
+            toast.success("Pago confirmado correctamente");
+
+            setResultadoCierre((prev) =>
+                prev
+                    ? {
+                        ...prev,
+                        pago: {
+                            ...prev.pago,
+                            estado: "Confirmado",
+                        },
+                    }
+                    : prev
+            );
+
+            await cargarSubasta();
+        } catch (error) {
+            console.error(error);
+            toast.error(
+                error?.response?.data?.message ||
+                error?.message ||
+                "No se pudo confirmar el pago"
+            );
+        } finally {
+            setIsConfirmandoPago(false);
         }
     };
 
@@ -166,23 +208,42 @@ export function SubastaVista() {
                         </div>
 
                         {resultado && (
-                            <div className="rounded-xl bg-black/20 p-4 border border-white/10">
+                            <div className="rounded-xl bg-black/20 p-4 border border-white/10 space-y-2">
                                 <p className="text-xs text-white/60 mb-2">Resultado del cierre</p>
 
                                 {resultado.estado_resultado === "CON_GANADOR" ? (
-                                    <div className="space-y-2">
+                                    <>
                                         <p className="text-lg font-bold text-emerald-300">
                                             Ganador: {resultado.ganador_nombre || `Usuario #${resultado.usuario_ganador_id}`}
                                         </p>
+
                                         <p className="text-sm text-white/80">
                                             Monto final: ₡{Number(resultado.monto_final || 0).toLocaleString("es-CR")}
                                         </p>
+
                                         {pago && (
                                             <p className="text-sm text-white/80">
-                                                Estado del pago: {pago.estado}
+                                                Estado del pago:{" "}
+                                                <span
+                                                    className={`font-semibold ${pagoConfirmado ? "text-emerald-300" : "text-amber-300"
+                                                        }`}
+                                                >
+                                                    {pago.estado}
+                                                </span>
                                             </p>
                                         )}
-                                    </div>
+
+                                        {pagoPendiente && (
+                                            <button
+                                                type="button"
+                                                onClick={handleConfirmarPago}
+                                                disabled={isConfirmandoPago}
+                                                className="w-full rounded-2xl bg-emerald-500 py-3 text-sm font-semibold text-white hover:bg-emerald-600 transition disabled:opacity-50"
+                                            >
+                                                {isConfirmandoPago ? "Confirmando..." : "CONFIRMAR PAGO"}
+                                            </button>
+                                        )}
+                                    </>
                                 ) : (
                                     <p className="text-lg font-bold text-amber-300">
                                         Subasta finalizada sin ofertas
@@ -273,12 +334,20 @@ export function SubastaVista() {
                         </div>
                     </div>
 
-                    <Link
-                        to="/subastas"
-                        className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 px-4 py-2.5 text-sm text-white/80 hover:text-white transition mt-6 pt-4 w-full"
-                    >
-                        ← Volver al catálogo
-                    </Link>
+                    {pagoPendiente ? (
+                        <div className="mt-6 pt-4 w-full">
+                            <p className="text-center text-sm text-amber-300 font-semibold">
+                                Debes confirmar el pago antes de salir.
+                            </p>
+                        </div>
+                    ) : (
+                        <Link
+                            to="/subastas"
+                            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 px-4 py-2.5 text-sm text-white/80 hover:text-white transition mt-6 pt-4 w-full"
+                        >
+                            ← Volver al catálogo
+                        </Link>
+                    )}
                 </div>
             </div>
         </div>
