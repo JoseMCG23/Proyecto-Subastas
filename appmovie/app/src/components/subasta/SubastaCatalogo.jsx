@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { SlidersHorizontal } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import SubastaService from "@/services/SubastaService";
+import Pusher from "pusher-js";
 
 const API_UPLOADS = "http://localhost:81/appmovie/api/uploads";
 
@@ -33,6 +34,28 @@ export function SubastaCatalogo() {
         };
 
         cargarDatos();
+        const pusher = new Pusher(import.meta.env.VITE_PUSHER_KEY, {
+            cluster: import.meta.env.VITE_PUSHER_CLUSTER,
+        });
+
+        const channel = pusher.subscribe("subastas");
+
+        channel.bind("subasta-creada", () => {
+            cargarDatos();
+        });
+
+        channel.bind("subasta-actualizada", () => {
+            cargarDatos();
+        });
+
+        channel.bind("subasta-estado-cambiado", () => {
+            cargarDatos();
+        });
+
+        return () => {
+            channel.unbind_all();
+            pusher.unsubscribe("subastas");
+        };
     }, []);
 
     // Categorías dinámicas

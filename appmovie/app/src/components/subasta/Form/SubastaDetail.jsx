@@ -1,10 +1,12 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useEffect } from "react";
+import Pusher from "pusher-js";
 
 const API_UPLOADS = "http://localhost:81/appmovie/api/uploads";
 
-export function SubastaDetail({ subasta, onClose, onEdit, onPublish, onCancel }) {
+export function SubastaDetail({ subasta, onClose, onEdit, onPublish, onCancel, onRefresh }) {
     const imgSrc = subasta?.imagen
         ? `${API_UPLOADS}/${subasta.imagen}`
         : "";
@@ -16,6 +18,38 @@ export function SubastaDetail({ subasta, onClose, onEdit, onPublish, onCancel })
 
     const nombreUsuarioCreador = subasta?.usuarioCreador || "Usuario desconocido";
 
+    useEffect(() => {
+        if (!subasta?.idsubasta) return;
+
+        const pusher = new Pusher(import.meta.env.VITE_PUSHER_KEY, {
+            cluster: import.meta.env.VITE_PUSHER_CLUSTER,
+        });
+
+        const channel = pusher.subscribe(`subasta-${subasta.idsubasta}`);
+
+        channel.bind("subasta-cerrada", () => {
+            if (onRefresh) onRefresh();
+        });
+
+        channel.bind("subasta-actualizada", () => {
+            if (onRefresh) onRefresh();
+        });
+
+        channel.bind("subasta-estado-cambiado", () => {
+            if (onRefresh) onRefresh();
+        });
+
+        channel.bind("puja-registrada", () => {
+            if (onRefresh) onRefresh();
+        });
+
+        return () => {
+            channel.unbind_all();
+            pusher.unsubscribe(`subasta-${subasta.idsubasta}`);
+        };
+    }, [subasta?.idsubasta, onRefresh]);
+
+    
     return (
         <AnimatePresence>
             <motion.div

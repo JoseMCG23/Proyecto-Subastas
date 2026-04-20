@@ -90,34 +90,42 @@ export function SubastaForm({
     const handleFormSubmit = async (data) => {
         try {
             // Combinar fecha y hora
+            const construirFechaLocal = (fecha, hora) => {
+                const [year, month, day] = fecha.split("-").map(Number);
+                const [hours, minutes] = hora.split(":").map(Number);
+                return new Date(year, month - 1, day, hours, minutes, 0, 0);
+            };
+
+            const fechaInicioDate = construirFechaLocal(data.fechaInicio, data.horaInicio);
+            const fechaFinDate = construirFechaLocal(data.fechafin, data.horaFin);
+
             const fechaInicioCompleta = `${data.fechaInicio} ${data.horaInicio}:00`;
             const fechaFinCompleta = `${data.fechafin} ${data.horaFin}:00`;
 
-            console.log('=== VALIDACIONES DE FECHA ===');
-            console.log('Fecha inicio completa:', fechaInicioCompleta);
-            console.log('Fecha fin completa:', fechaFinCompleta);
-            console.log('Fecha inicio Date:', new Date(fechaInicioCompleta));
-            console.log('Fecha fin Date:', new Date(fechaFinCompleta));
-            console.log('Ahora:', new Date());
+            const ahora = new Date();
+            ahora.setSeconds(0, 0);
+
+            console.log("=== VALIDACIONES DE FECHA ===");
+            console.log("Fecha inicio:", fechaInicioDate);
+            console.log("Fecha fin:", fechaFinDate);
+            console.log("Ahora:", ahora);
 
             // Validar fecha de inicio no sea en el pasado
-            if (new Date(fechaInicioCompleta) <= new Date()) {
-                console.log('❌ ERROR: Fecha de inicio en el pasado');
-                alert("ERROR: La fecha de inicio debe ser menor a la fecha de cierre");
-                toast.error("La fecha de inicio debe ser menor a la fecha de cierre");
+            if (fechaInicioDate < ahora) {
+                console.log("❌ ERROR: Fecha de inicio en el pasado");
+                toast.error("La fecha de inicio debe ser en el futuro");
                 return;
             }
 
-            // Valida fecha cierre > fecha inicio
-            if (new Date(fechaFinCompleta) <= new Date(fechaInicioCompleta)) {
-                console.log('❌ ERROR: Fecha de fin <= fecha de inicio');
-                alert("ERROR: La fecha de cierre debe ser mayor a la de inicio");
+            // Validar fecha cierre > fecha inicio
+            if (fechaFinDate <= fechaInicioDate) {
+                console.log("❌ ERROR: Fecha de fin <= fecha de inicio");
                 toast.error("La fecha de cierre debe ser mayor a la de inicio");
                 return;
             }
 
             console.log('✅ Validaciones pasaron, enviando...');
-            alert("Validaciones pasaron, enviando al servidor...");
+            
 
             const payload = {
                 ...data,

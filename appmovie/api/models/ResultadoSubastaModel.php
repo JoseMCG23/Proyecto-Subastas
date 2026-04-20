@@ -35,8 +35,12 @@ class ResultadoSubastaModel
         }
 
         // Si todavía no ha llegado la fecha de cierre, no cerrar
-        $fechaActual = date("Y-m-d H:i:s");
-        if ($fechaActual < $subasta->fechafin) {
+        date_default_timezone_set('America/Costa_Rica');
+
+        $fechaActual = new DateTime();
+        $fechaFin = new DateTime($subasta->fechafin);
+
+        if ($fechaActual < $fechaFin) {
             return [
                 "success" => false,
                 "message" => "La subasta aún no ha terminado",

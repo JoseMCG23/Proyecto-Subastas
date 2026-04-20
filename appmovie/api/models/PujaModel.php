@@ -15,8 +15,11 @@ class PujaModel{
 
     //pujas por subasta
     public function getBySubasta($idSubasta){
-        $sql = "SELECT p.idPuja, CONCAT(u.nombre,' ',u.apellido) AS usuario, p.monto, p.fechaYhora
-                FROM Puja p INNER JOIN Usuario u ON p.usuarioId = u.id WHERE p.subastaId = $idSubasta ORDER BY p.fechaYhora DESC;";
+        $sql = "SELECT p.idPuja, p.usuarioId, CONCAT(u.nombre,' ',u.apellido) AS usuario, p.monto, p.fechaYhora
+                FROM Puja p
+                INNER JOIN Usuario u ON p.usuarioId = u.id
+                WHERE p.subastaId = $idSubasta
+                ORDER BY p.fechaYhora DESC;";
 
         return $this->enlace->ExecuteSQL($sql);
     }
@@ -110,14 +113,47 @@ class PujaModel{
 
         $id = $this->enlace->executeSQL_DML_last($sql);
 
+        $this->emitirEventoPuja($objeto->subastaId);
+
         // 9. Retornar la puja creada
         $sql = "SELECT p.idPuja, p.subastaId, p.usuarioId, p.monto, p.fechaYhora
             FROM Puja p
             WHERE p.idPuja = $id
             LIMIT 1;";
 
+            
+
         $r = $this->enlace->ExecuteSQL($sql);
         return (!empty($r)) ? $r[0] : null;
     }
     
+    private function emitirEventoPuja($idSubasta)
+    {
+        require_once __DIR__ . '/../vendor/autoload.php';
+
+        $config = include __DIR__ . '/../config.php';
+
+        $pusher = new Pusher\Pusher(
+            $config['PUSHER_KEY'],
+            $config['PUSHER_SECRET'],
+            $config['PUSHER_APP_ID'],
+            [
+                'cluster' => $config['PUSHER_CLUSTER'],
+                'useTLS' => true
+            ]
+        );
+
+        $subasta = $this->getSubasta($idSubasta);
+        $pujaMayor = $this->getPujaMayor($idSubasta);
+        $historial = $this->getBySubasta($idSubasta);
+
+        $payload = [
+            'subastaId' => (int)$idSubasta,
+            'estado' => $subasta ? $subasta->estado : null,
+            'pujaMayor' => $pujaMayor,
+            'historial' => $historial
+        ];
+
+        $pusher->trigger("subasta-$idSubasta", "puja-registrada", $payload);
+    }
 }

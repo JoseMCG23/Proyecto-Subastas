@@ -12,7 +12,6 @@ export function MantenimientoSubasta() {
     const [showUpdate, setShowUpdate] = useState(false);
     const [showDetail, setShowDetail] = useState(false);
     const [selectedSubasta, setSelectedSubasta] = useState(null);
-    const [refreshKey, setRefreshKey] = useState(0);
 
     const handleCreate = () => {
         setShowCreate(true);
@@ -45,7 +44,6 @@ export function MantenimientoSubasta() {
         try {
             await SubastaService.publicarSubasta(subasta.idsubasta);
             toast.success("Subasta publicada exitosamente");
-            setRefreshKey(prev => prev + 1);
         } catch (err) {
             console.error(err);
             toast.error(err.response?.data?.message || err.message || "Error al publicar subasta");
@@ -64,7 +62,6 @@ export function MantenimientoSubasta() {
         try {
             await SubastaService.cancelarSubasta(idSubasta);
             toast.success("Subasta cancelada exitosamente");
-            setRefreshKey(prev => prev + 1);
         } catch (err) {
             console.error(err);
             toast.error(err.response?.data?.message || err.message || "Error al cancelar subasta");
@@ -79,13 +76,11 @@ export function MantenimientoSubasta() {
     };
 
     const handleSuccess = () => {
-        setRefreshKey(prev => prev + 1);
     };
 
     return (
         <>
             <SubastaList
-                key={refreshKey}
                 onCreate={handleCreate}
                 onEdit={handleEdit}
                 onViewDetail={handleViewDetail}
@@ -123,6 +118,10 @@ export function MantenimientoSubasta() {
                         }}
                         onPublish={() => handlePublish(selectedSubasta.idsubasta)}
                         onCancel={() => handleCancel(selectedSubasta.idsubasta)}
+                        onRefresh={async () => {
+                            const res = await SubastaService.getSubastaById(selectedSubasta.idsubasta);
+                            setSelectedSubasta(res.data?.data ?? null);
+                        }}
                     />
                 )}
             </AnimatePresence>

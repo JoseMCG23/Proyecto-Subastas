@@ -6,6 +6,118 @@ class SubastaModel {
         $this->enlace = new MySqlConnect();
     }
 
+    private function emitirEventoSubastas($evento, $payload = [])
+    {
+        require_once __DIR__ . '/../vendor/autoload.php';
+        $config = include __DIR__ . '/../config.php';
+
+        $pusher = new Pusher\Pusher(
+            $config['PUSHER_KEY'],
+            $config['PUSHER_SECRET'],
+            $config['PUSHER_APP_ID'],
+            [
+                'cluster' => $config['PUSHER_CLUSTER'],
+                'useTLS' => true
+            ]
+        );
+
+        $pusher->trigger('subastas', $evento, $payload);
+    }
+
+    private function emitirEventoPuja($idSubasta)
+    {
+        require_once __DIR__ . '/../vendor/autoload.php';
+        $config = include __DIR__ . '/../config.php';
+
+        $pusher = new Pusher\Pusher(
+            $config['PUSHER_KEY'],
+            $config['PUSHER_SECRET'],
+            $config['PUSHER_APP_ID'],
+            [
+                'cluster' => $config['PUSHER_CLUSTER'],
+                'useTLS' => true
+            ]
+        );
+
+        $subasta = $this->getSubasta($idSubasta);
+        $pujaMayor = $this->getPujaMayor($idSubasta);
+        $historial = $this->getBySubasta($idSubasta);
+
+        $pusher->trigger("subasta-$idSubasta", "puja-registrada", [
+            'subastaId' => (int)$idSubasta,
+            'estado' => $subasta ? $subasta->estado : null,
+            'pujaMayor' => $pujaMayor,
+            'historial' => $historial
+        ]);
+    }
+
+    private function sincronizarEstadoPorFecha($idSubasta)
+    {
+        date_default_timezone_set('America/Costa_Rica');
+
+        $sql = "SELECT idsubasta, estado, fechaInicio, fechafin
+                FROM subasta
+                WHERE idsubasta = $idSubasta;";
+        $r = $this->enlace->executeSQL($sql);
+
+        if (empty($r)) {
+            return;
+        }
+
+        $subasta = $r[0];
+        $estado = strtoupper($subasta->estado);
+
+        // No tocar subastas que ya no deben cambiar
+        if (in_array($estado, ['FINALIZADA', 'CANCELADA', 'INACTIVA'])) {
+            return;
+        }
+
+        $ahora = new DateTime();
+        $fechaInicio = new DateTime($subasta->fechaInicio);
+        $fechaFin = new DateTime($subasta->fechafin);
+
+        // Si ya venció, pasar a FINALIZADA
+        if ($ahora >= $fechaFin && $estado !== 'FINALIZADA') {
+            $sql = "UPDATE subasta
+                    SET estado = 'FINALIZADA'
+                    WHERE idsubasta = $idSubasta;";
+            $this->enlace->executeSQL_DML($sql);
+
+            $this->emitirEventoSubastas('subasta-estado-cambiado', [
+                'idSubasta' => $idSubasta,
+                'estado' => 'FINALIZADA'
+            ]);
+
+            return;
+        }
+
+        // Si ya inició y estaba programada, pasar a ACTIVA
+        if ($estado === 'PROGRAMADA' && $ahora >= $fechaInicio && $ahora < $fechaFin) {
+            $sql = "UPDATE subasta
+                    SET estado = 'ACTIVA'
+                    WHERE idsubasta = $idSubasta;";
+            $this->enlace->executeSQL_DML($sql);
+
+            $this->emitirEventoSubastas('subasta-estado-cambiado', [
+                'idSubasta' => $idSubasta,
+                'estado' => 'ACTIVA'
+            ]);
+        }
+    }
+
+    public function sincronizarTodasPorFecha()
+    {
+        $sql = "SELECT idsubasta FROM subasta
+                WHERE estado IN ('PROGRAMADA', 'ACTIVA');";
+        $r = $this->enlace->executeSQL($sql);
+
+        if (!empty($r)) {
+            foreach ($r as $item) {
+                $this->sincronizarEstadoPorFecha($item->idsubasta);
+            }
+        }
+    }
+        
     private function getNombreUsuario($idUsuario)
     {
         $sql = "SELECT nombre, apellido FROM Usuario WHERE id=$idUsuario;";
@@ -14,41 +126,45 @@ class SubastaModel {
         return null;
     }
 
-    public function all(){
-
+    public function all()
+    {
         $sql = "SELECT 
-                    s.idsubasta,
-                    s.funko_id,
-                    f.nombre AS objeto,
-                    f.imagen_portada AS imagen,
-                    f.vendedor_id,
-                    f.condicion,
-                    s.fechaInicio,
-                    s.fechafin,
-                    s.precioBase,
-                    s.incre_minimo,
-                    s.estado,
-                    COUNT(DISTINCT p.idPuja) AS cantidadPujas,
-                    GROUP_CONCAT(DISTINCT c.nombre SEPARATOR ', ') AS categorias
-                FROM subasta s
-                INNER JOIN Funko f ON s.funko_id = f.idFunko
-                LEFT JOIN Puja p ON p.subastaId = s.idsubasta
-                LEFT JOIN funko_categoria fc ON fc.funko_id = f.idFunko
-                LEFT JOIN Categoria c ON c.idCategoria = fc.categoria_id
-                GROUP BY s.idsubasta
-                ORDER BY s.idsubasta DESC;";
+            s.idsubasta,
+            s.funko_id,
+            f.nombre AS objeto,
+            f.imagen_portada AS imagen,
+            f.vendedor_id,
+            f.condicion,
+            s.fechaInicio,
+            s.fechafin,
+            s.precioBase,
+            s.incre_minimo,
+            s.estado,
+            (
+                SELECT COUNT(*)
+                FROM Puja p
+                WHERE p.subastaId = s.idsubasta
+            ) AS cantidadPujas,
+            (
+                SELECT GROUP_CONCAT(DISTINCT c.nombre SEPARATOR ', ')
+                FROM funko_categoria fc
+                INNER JOIN Categoria c ON c.idCategoria = fc.categoria_id
+                WHERE fc.funko_id = f.idFunko
+            ) AS categorias
+        FROM subasta s
+        INNER JOIN Funko f ON s.funko_id = f.idFunko
+        ORDER BY s.idsubasta DESC;";
 
-        $r = $this->enlace->ExecuteSQL($sql);
+        $r = $this->enlace->executeSQL($sql);
 
         if (!empty($r) && is_array($r)) {
             for ($i = 0; $i < count($r); $i++) {
                 $r[$i]->usuarioCreador = $this->getNombreUsuario($r[$i]->vendedor_id);
-                // Opcionalmente quitar el vendedor_id si no se necesita
                 unset($r[$i]->vendedor_id);
             }
         }
-
-        return $r;
+        
+        return $r ?: [];
     }
     
     //Cantidad Pujas
@@ -146,55 +262,48 @@ class SubastaModel {
         error_log("Fecha fin: " . $objeto->fechafin);
         error_log("Precio base: " . $objeto->precioBase);
         error_log("Incremento: " . $objeto->incre_minimo);
+        error_log("Funko ID: " . $objeto->funko_id);
 
-        // Fecha de inicio debe ser en el futuro
-        if (strtotime($objeto->fechaInicio) <= time()) {
-            error_log("ERROR: Fecha de inicio en el pasado");
+        date_default_timezone_set('America/Costa_Rica');
+
+        $fechaInicio = new DateTime($objeto->fechaInicio);
+        $fechaFin = new DateTime($objeto->fechafin);
+        $ahora = new DateTime();
+        $ahora->setTime((int)$ahora->format('H'), (int)$ahora->format('i'), 0);
+
+        error_log("fechaInicio recibida: " . $fechaInicio->format('Y-m-d H:i:s'));
+        error_log("fechaFin recibida: " . $fechaFin->format('Y-m-d H:i:s'));
+        error_log("ahora servidor: " . $ahora->format('Y-m-d H:i:s'));
+
+        if ($fechaInicio < $ahora) {
             throw new Exception("La fecha de inicio debe ser en el futuro");
         }
 
-        // Fecha cierre > fecha inicio
-        if (strtotime($objeto->fechafin) <= strtotime($objeto->fechaInicio)) {
-            error_log("ERROR: Fecha de fin <= fecha de inicio");
+        if ($fechaFin <= $fechaInicio) {
             throw new Exception("La fecha de cierre debe ser mayor a la de inicio");
         }
 
-        //Precio base > 0
-        if ($objeto->precioBase <= 0) {
-            error_log("ERROR: Precio base <= 0");
+        if (!isset($objeto->precioBase) || $objeto->precioBase <= 0) {
             throw new Exception("El precio base debe ser mayor a 0");
         }
 
-        //Incremento mínimo > 0
-        if ($objeto->incre_minimo <= 0) {
-            error_log("ERROR: Incremento <= 0");
+        if (!isset($objeto->incre_minimo) || $objeto->incre_minimo <= 0) {
             throw new Exception("El incremento mínimo debe ser mayor a 0");
         }
 
+        if (!isset($objeto->funko_id) || !is_numeric($objeto->funko_id)) {
+            throw new Exception("El funko seleccionado no es válido");
+        }
 
-        //El objeto (funko)no puede tener otra subasta activa
         $sql = "SELECT idsubasta FROM subasta
                 WHERE funko_id = $objeto->funko_id
                 AND estado = 'ACTIVA';";
         $r = $this->enlace->executeSQL($sql);
 
         if (!empty($r)) {
-            error_log("ERROR: Funko tiene subasta activa");
             throw new Exception("El funko ya tiene una subasta activa");
         }
 
-        // El objeto (funko) debe estar activo
-        $sql = "SELECT estado FROM Funko WHERE idFunko = $objeto->funko_id;";
-        $r = $this->enlace->executeSQL($sql);
-
-        if (empty($r) || $r[0]->estado != 'DISPONIBLE') {
-            error_log("ERROR: Funko no disponible");
-            throw new Exception("El funko no está disponible");
-        }
-
-        error_log("Todas las validaciones pasaron, creando subasta...");
-
-        // El objeto (funko) debe estar activo
         $sql = "SELECT estado FROM Funko WHERE idFunko = $objeto->funko_id;";
         $r = $this->enlace->executeSQL($sql);
 
@@ -202,19 +311,30 @@ class SubastaModel {
             throw new Exception("El funko no está disponible");
         }
 
-        // Insert
-        $sql = "INSERT INTO subasta 
+        $sql = "INSERT INTO subasta
                 (funko_id, fechaInicio, fechafin, precioBase, incre_minimo, estado)
                 VALUES (
-                    $objeto->funko_id,
-                    '$objeto->fechaInicio',
-                    '$objeto->fechafin',
-                    $objeto->precioBase,
-                    $objeto->incre_minimo,
+                    " . (int)$objeto->funko_id . ",
+                    '" . $objeto->fechaInicio . "',
+                    '" . $objeto->fechafin . "',
+                    " . (float)$objeto->precioBase . ",
+                    " . (float)$objeto->incre_minimo . ",
                     'INACTIVA'
                 );";
 
+        error_log("SQL INSERT SUBASTA: " . $sql);
+
         $id = $this->enlace->executeSQL_DML_last($sql);
+
+        $nuevaSubasta = $this->get($id);
+        $this->emitirEventoSubastas('subasta-creada', [
+            'idSubasta' => $id,
+            'subasta' => $nuevaSubasta
+        ]);
+
+        if (!$id) {
+            throw new Exception("No se pudo crear la subasta");
+        }
 
         return $this->get($id);
     }
@@ -280,29 +400,54 @@ class SubastaModel {
 
         $this->enlace->executeSQL_DML($sql);
 
-        return $this->get($id);
+        $subastaActualizada = $this->get($id);
+
+        $this->emitirEventoSubastas('subasta-actualizada', [
+            'idSubasta' => $id,
+            'subasta' => $subastaActualizada
+        ]);
+
+        return $subastaActualizada;
     }
 
     //Publicar subasta
     public function publicar($id)
     {
-        $sql = "SELECT estado FROM subasta WHERE idsubasta = $id;";
+        date_default_timezone_set('America/Costa_Rica');
+
+        $sql = "SELECT estado, fechaInicio, fechafin FROM subasta WHERE idsubasta = $id;";
         $r = $this->enlace->executeSQL($sql);
 
         if (empty($r)) {
             throw new Exception("Subasta no encontrada");
         }
 
-        // Solo publicar subasta INACTIVA (subasta creada lista para programar)
         if ($r[0]->estado != 'INACTIVA') {
             throw new Exception("Solo se pueden publicar subastas INACTIVAS");
         }
 
-        // Cambia a PROGRAMADA (lista para iniciar)
-        $sql = "UPDATE subasta SET estado = 'PROGRAMADA' WHERE idsubasta = $id;";
+        $ahora = new DateTime();
+        $fechaInicio = new DateTime($r[0]->fechaInicio);
+        $fechaFin = new DateTime($r[0]->fechafin);
+
+        if ($ahora >= $fechaFin) {
+            throw new Exception("No se puede publicar una subasta ya vencida");
+        }
+
+        $nuevoEstado = ($ahora >= $fechaInicio) ? 'ACTIVA' : 'PROGRAMADA';
+
+        $sql = "UPDATE subasta SET estado = '$nuevoEstado' WHERE idsubasta = $id;";
         $this->enlace->executeSQL_DML($sql);
 
-        return $this->get($id);
+        $subastaPublicada = $this->get($id);
+
+        $this->emitirEventoSubastas('subasta-estado-cambiado', [
+            'idSubasta' => $id,
+            'estado' => $subastaPublicada->estado,
+            'subasta' => $subastaPublicada
+        ]);
+
+        return $subastaPublicada;
     }
 
     //Cancelar subasta
@@ -320,6 +465,11 @@ class SubastaModel {
 
             $sql = "UPDATE subasta SET estado = 'CANCELADA' WHERE idsubasta = $id;";
             $this->enlace->executeSQL_DML($sql);
+
+            $this->emitirEventoSubastas('subasta-estado-cambiado', [
+                'idSubasta' => $id,
+                'estado' => 'CANCELADA'
+            ]);
 
             return $this->get($id);
         }

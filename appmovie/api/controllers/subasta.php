@@ -5,6 +5,7 @@ class subasta
         try {
             $response = new Response();
             $m = new SubastaModel();
+            $m->sincronizarTodasPorFecha();
             $result = $m->all();
             $response->toJSON($result);
         } catch (Exception $e) {
@@ -16,6 +17,7 @@ class subasta
         try {
             $response = new Response();
             $m = new SubastaModel();
+            $m->sincronizarTodasPorFecha();
             $result = $m->get($id);
             $response->toJSON($result);
         } catch (Exception $e) {
@@ -27,6 +29,7 @@ class subasta
         try {
             $response = new Response();
             $m = new SubastaModel();
+            $m->sincronizarTodasPorFecha();
             $result = $m->getActivas();
             $response->toJSON($result);
         } catch (Exception $e) {
@@ -38,6 +41,7 @@ class subasta
         try {
             $response = new Response();
             $m = new SubastaModel();
+            $m->sincronizarTodasPorFecha();
             $result = $m->getFinalizadas();
             $response->toJSON($result);
         } catch (Exception $e) {
@@ -72,7 +76,7 @@ class subasta
             //Dar respuesta
             $response->toJSON($result);
         } catch (Exception $e) {
-            $response->toJSON($result);
+            
             handleException($e);
         }
     }

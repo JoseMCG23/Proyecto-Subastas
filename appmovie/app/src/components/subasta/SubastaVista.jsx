@@ -20,19 +20,26 @@ export function SubastaVista() {
 
     const cargarSubasta = async () => {
         try {
-            const cierreRes = await SubastaService.cerrarSubasta(id);
-            setResultadoCierre(cierreRes.data?.data ?? null);
-
             const subastaRes = await SubastaService.getSubastaById(id);
             setSubasta(subastaRes.data?.data ?? null);
+
+            try {
+                const cierreRes = await SubastaService.cerrarSubasta(id);
+                setResultadoCierre(cierreRes.data?.data ?? null);
+            } catch (errorCierre) {
+                console.error("Error cerrando subasta:", errorCierre);
+            }
+
         } catch (error) {
-            console.error(error);
+            console.error("Error cargando subasta:", error);
         }
     };
 
     useEffect(() => {
         cargarSubasta();
     }, [id]);
+
+    
 
     useEffect(() => {
         const pusher = new Pusher(import.meta.env.VITE_PUSHER_KEY, {
@@ -42,6 +49,8 @@ export function SubastaVista() {
         const channel = pusher.subscribe(`subasta-${id}`);
 
         channel.bind("subasta-cerrada", (data) => {
+            if (!data) return;
+
             setResultadoCierre({
                 resultado: data.resultado,
                 pago: data.pago,
@@ -57,12 +66,41 @@ export function SubastaVista() {
             );
 
             toast.success("La subasta se finalizó automáticamente");
+            cargarSubasta();
+        });
+
+        channel.bind("puja-registrada", (data) => {
+            if (!data) return;
+
+            const nuevoLiderId = Number(data?.pujaMayor?.usuarioId ?? 0);
+            const yoSoyActual = Number(usuarioActualId);
+
+            if (nuevoLiderId && nuevoLiderId !== yoSoyActual) {
+                const yoHabiaPujado = Array.isArray(data?.historial)
+                    ? data.historial.some((p) => Number(p.usuarioId) === yoSoyActual)
+                    : false;
+
+                if (yoHabiaPujado) {
+                    toast("Puja ha sido superada");
+                }
+            }
+
+            cargarSubasta();
+        });
+
+        channel.bind("subasta-actualizada", (data) => {
+            if (!data) return;
+            cargarSubasta();
+        });
+
+        channel.bind("subasta-estado-cambiado", (data) => {
+            if (!data) return;
+            cargarSubasta();
         });
 
         return () => {
             channel.unbind_all();
-            channel.unsubscribe();
-            pusher.disconnect();
+            pusher.unsubscribe(`subasta-${id}`);
         };
     }, [id]);
 
@@ -113,7 +151,6 @@ export function SubastaVista() {
 
             toast.success("Puja registrada correctamente");
             setMontoPuja("");
-            await cargarSubasta();
         } catch (error) {
             console.error(error);
             toast.error(
