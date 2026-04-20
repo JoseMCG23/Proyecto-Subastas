@@ -39,9 +39,9 @@ class SubastaModel {
             ]
         );
 
-        $subasta = $this->getSubasta($idSubasta);
+        $subasta = $this->get($idSubasta);
         $pujaMayor = $this->getPujaMayor($idSubasta);
-        $historial = $this->getBySubasta($idSubasta);
+        $historial = $this->getPujas($idSubasta);
 
         $pusher->trigger("subasta-$idSubasta", "puja-registrada", [
             'subastaId' => (int)$idSubasta,
@@ -218,16 +218,40 @@ class SubastaModel {
     }
 
     //Detalle de una subasta en especifico
-    public function get($id){
-        $sql = "SELECT s.idsubasta, s.funko_id, s.fechaInicio, s.fechafin, s.precioBase, s.incre_minimo, s.estado, f.nombre, f.imagen_portada, f.condicion, f.idFunko
-                FROM subasta s INNER JOIN Funko f ON s.funko_id = f.idFunko WHERE s.idsubasta = $id;";
+    public function get($id)
+    {
+        $sql = "SELECT 
+                    s.idsubasta,
+                    s.funko_id,
+                    s.fechaInicio,
+                    s.fechafin,
+                    s.precioBase,
+                    s.incre_minimo,
+                    s.estado,
+                    f.idFunko,
+                    f.nombre,
+                    f.descripcion,
+                    f.imagen_portada,
+                    f.condicion,
+                    f.vendedor_id,
+                    CONCAT(u.nombre, ' ', u.apellido) AS vendedor_nombre,
+                    u.correo AS vendedor_correo
+                FROM subasta s
+                INNER JOIN Funko f ON s.funko_id = f.idFunko
+                LEFT JOIN Usuario u ON f.vendedor_id = u.id
+                WHERE s.idsubasta = $id;";
+
         $r = $this->enlace->ExecuteSQL($sql);
+
         if (!empty($r)) {
             $subasta = $r[0];
+
             $subasta->cantidadTotalPujas = $this->getCantidadPujas($id);
             $subasta->categorias = $this->getCategoriasFunko($subasta->idFunko);
+            $subasta->imagenes = $this->getImagenesFunko($subasta->idFunko);
+            $subasta->pujaActual = $this->getPujaMayor($id);
+            $subasta->historial = $this->getPujas($id);
 
-            // Asegurar funko_id para compatibilidad con el formulario de edición
             if (isset($subasta->idFunko) && !isset($subasta->funko_id)) {
                 $subasta->funko_id = $subasta->idFunko;
             }
@@ -241,10 +265,46 @@ class SubastaModel {
     }
 
     //Historial pujas de una subasta
-    public function getPujas($idSubasta){
-        $sql = "SELECT CONCAT(u.nombre,' ',u.apellido) AS usuario, p.monto, p.fechaYhora
-                FROM Puja p INNER JOIN Usuario u ON p.usuarioId = u.id WHERE p.subastaId = $idSubasta ORDER BY p.fechaYhora DESC;";
+    public function getPujas($idSubasta)
+    {
+        $sql = "SELECT 
+                    p.idPuja,
+                    p.usuarioId,
+                    CONCAT(u.nombre,' ',u.apellido) AS usuario,
+                    p.monto,
+                    p.fechaYhora
+                FROM Puja p
+                INNER JOIN Usuario u ON p.usuarioId = u.id
+                WHERE p.subastaId = $idSubasta
+                ORDER BY p.fechaYhora DESC, p.idPuja DESC;";
         return $this->enlace->ExecuteSQL($sql);
+    }
+
+    private function getImagenesFunko($idFunko)
+    {
+        $sql = "SELECT idImagen, urlImagen
+                FROM Funko_Imagen
+                WHERE funko_id = $idFunko
+                ORDER BY idImagen ASC;";
+        return $this->enlace->ExecuteSQL($sql) ?: [];
+    }
+
+    private function getPujaMayor($idSubasta)
+    {
+        $sql = "SELECT 
+                    p.idPuja,
+                    p.usuarioId,
+                    CONCAT(u.nombre, ' ', u.apellido) AS usuario,
+                    p.monto,
+                    p.fechaYhora
+                FROM Puja p
+                INNER JOIN Usuario u ON p.usuarioId = u.id
+                WHERE p.subastaId = $idSubasta
+                ORDER BY p.monto DESC, p.fechaYhora DESC
+                LIMIT 1;";
+
+        $r = $this->enlace->ExecuteSQL($sql);
+        return !empty($r) ? $r[0] : null;
     }
 
     //Categorias del funko
@@ -476,6 +536,8 @@ class SubastaModel {
 
         throw new Exception("No se puede cancelar la subasta");
     }
+
+    
 
     
 }
