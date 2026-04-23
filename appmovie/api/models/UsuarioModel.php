@@ -1,4 +1,6 @@
 <?php
+
+use Firebase\JWT\JWT;
 class UsuarioModel
 {
     public $enlace;
@@ -135,6 +137,104 @@ class UsuarioModel
 
         $cResults = $this->enlace->executeSQL_DML($sql);
         return $this->get($objeto->id);
+    }
+    public function login($objeto)
+    {
+        if (!isset($objeto->correo) || !isset($objeto->password)) {
+            throw new Exception("Correo y contraseña son obligatorios");
+        }
+
+        $correo = $objeto->correo;
+        $password = $objeto->password;
+
+        $sql = "SELECT u.id, u.nombre, u.apellido, u.correo, u.contraseña, u.estado,
+                   r.id AS rol_id, r.nombre AS rol_nombre
+            FROM Usuario u
+            INNER JOIN Roles r ON u.rol_id = r.id
+            WHERE u.correo = '$correo'
+            LIMIT 1;";
+
+        $resultado = $this->enlace->executeSQL($sql);
+
+        if (empty($resultado)) {
+            throw new Exception("Usuario o contraseña incorrectos");
+        }
+
+        $usuario = $resultado[0];
+
+        if (strtoupper($usuario->estado) !== "ACTIVO") {
+            throw new Exception("El usuario está bloqueado o inactivo");
+        }
+
+        if (!password_verify($password, $usuario->contraseña)) {
+            throw new Exception("Usuario o contraseña incorrectos");
+        }
+
+        $data = [
+            'id' => $usuario->id,
+            'correo' => $usuario->correo,
+            'nombre' => $usuario->nombre . ' ' . $usuario->apellido,
+            'rol' => $usuario->rol_nombre,
+            'iat' => time(),
+            'exp' => time() + 3600
+        ];
+
+        $jwt_token = JWT::encode($data, Config::get('SECRET_KEY'), 'HS256');
+
+        return [
+            'success' => true,
+            'message' => 'Login correcto',
+            'data' => $jwt_token
+        ];
+    }
+    public function create($objeto)
+    {
+        if (
+            !isset($objeto->nombre) ||
+            !isset($objeto->apellido) ||
+            !isset($objeto->correo) ||
+            !isset($objeto->password) ||
+            !isset($objeto->cedula) ||
+            !isset($objeto->direccion)
+        ) {
+            throw new Exception("Faltan datos obligatorios para registrar el usuario");
+        }
+
+        $correo = $objeto->correo;
+
+        $sqlExiste = "SELECT id FROM Usuario WHERE correo = '$correo' LIMIT 1;";
+        $existe = $this->enlace->executeSQL($sqlExiste);
+
+        if (!empty($existe)) {
+            throw new Exception("Ya existe un usuario registrado con ese correo");
+        }
+
+        $sqlRol = "SELECT id FROM Roles WHERE UPPER(nombre) = 'COMPRADOR' LIMIT 1;";
+        $rolResult = $this->enlace->executeSQL($sqlRol);
+
+        if (empty($rolResult)) {
+            throw new Exception("No existe el rol COMPRADOR en la base de datos");
+        }
+
+        $rolId = (int)$rolResult[0]->id;
+        $passwordHash = password_hash($objeto->password, PASSWORD_DEFAULT);
+
+        $sql = "INSERT INTO Usuario
+                (nombre, apellido, correo, contraseña, cedula, direccion, estado, fechaRegistro, rol_id)
+            VALUES
+                ('$objeto->nombre',
+                 '$objeto->apellido',
+                 '$objeto->correo',
+                 '$passwordHash',
+                 '$objeto->cedula',
+                 '$objeto->direccion',
+                 'ACTIVO',
+                 NOW(),
+                 $rolId);";
+
+        $id = $this->enlace->executeSQL_DML_last($sql);
+
+        return $this->get($id);
     }
 }
 

@@ -40,8 +40,8 @@ export function SubastaVista() {
     }, [id]);
 
     useEffect(() => {
-        // Esto es solo para refrescar el contador visual.
-        // Si tu profe te cuestiona, aclará que NO estás haciendo polling al backend.
+        //  para refrescar el contador visual.
+
         const timer = setInterval(() => {
             setAhora(Date.now());
         }, 1000);
@@ -176,15 +176,15 @@ export function SubastaVista() {
     const pago = resultadoCierre?.pago ?? null;
     const pujaActual = subasta.pujaActual ?? null;
     const historial = Array.isArray(subasta.historial)
-    ? [...subasta.historial].sort((a, b) => {
-        const fechaA = new Date((a.fechaYhora || "").replace(" ", "T")).getTime();
-        const fechaB = new Date((b.fechaYhora || "").replace(" ", "T")).getTime();
+        ? [...subasta.historial].sort((a, b) => {
+            const fechaA = new Date((a.fechaYhora || "").replace(" ", "T")).getTime();
+            const fechaB = new Date((b.fechaYhora || "").replace(" ", "T")).getTime();
 
-        if (fechaB !== fechaA) return fechaB - fechaA;
+            if (fechaB !== fechaA) return fechaB - fechaA;
 
-        return Number(b.idPuja || 0) - Number(a.idPuja || 0);
-    })
-    : [];
+            return Number(b.idPuja || 0) - Number(a.idPuja || 0);
+        })
+        : [];
 
     const subastaCerrada = estado === "FINALIZADA" || estado === "CANCELADA";
     const puedePujar = estado === "ACTIVA";
@@ -221,8 +221,8 @@ export function SubastaVista() {
             console.error(error);
             toast.error(
                 error?.response?.data?.message ||
-                    error?.response?.data?.error ||
-                    "No se pudo registrar la puja"
+                error?.response?.data?.error ||
+                "No se pudo registrar la puja"
             );
         } finally {
             setIsSubmittingPuja(false);
@@ -245,12 +245,12 @@ export function SubastaVista() {
             setResultadoCierre((prev) =>
                 prev
                     ? {
-                          ...prev,
-                          pago: {
-                              ...prev.pago,
-                              estado: "Confirmado",
-                          },
-                      }
+                        ...prev,
+                        pago: {
+                            ...prev.pago,
+                            estado: "Confirmado",
+                        },
+                    }
                     : prev
             );
 
@@ -259,8 +259,8 @@ export function SubastaVista() {
             console.error(error);
             toast.error(
                 error?.response?.data?.message ||
-                    error?.message ||
-                    "No se pudo confirmar el pago"
+                error?.message ||
+                "No se pudo confirmar el pago"
             );
         } finally {
             setIsConfirmandoPago(false);
@@ -296,11 +296,10 @@ export function SubastaVista() {
                                         key={`${img.urlImagen}-${index}`}
                                         type="button"
                                         onClick={() => setImagenActiva(index)}
-                                        className={`rounded-2xl overflow-hidden border ${
-                                            imagenActiva === index
+                                        className={`rounded-2xl overflow-hidden border ${imagenActiva === index
                                                 ? "border-violet-400"
                                                 : "border-white/10"
-                                        } bg-white/5`}
+                                            } bg-white/5`}
                                     >
                                         <img
                                             src={thumbSrc}
@@ -462,11 +461,10 @@ export function SubastaVista() {
                                             <p className="text-sm text-white/80">
                                                 Estado del pago:{" "}
                                                 <span
-                                                    className={`font-semibold ${
-                                                        pagoConfirmado
+                                                    className={`font-semibold ${pagoConfirmado
                                                             ? "text-emerald-300"
                                                             : "text-amber-300"
-                                                    }`}
+                                                        }`}
                                                 >
                                                     {pago.estado}
                                                 </span>

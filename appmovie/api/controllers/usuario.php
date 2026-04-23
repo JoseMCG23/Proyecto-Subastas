@@ -62,5 +62,34 @@ class usuario
             handleException($e);
         }
     }
+    public function login()
+    {
+        try {
+            $request = new Request();
+            $response = new Response();
+            $inputJSON = $request->getJSON();
 
+            $usuario = new UsuarioModel();
+            $result = $usuario->login($inputJSON);
+
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+    public function create()
+    {
+        try {
+            $request = new Request();
+            $response = new Response();
+            $inputJSON = $request->getJSON();
+
+            $usuario = new UsuarioModel();
+            $result = $usuario->create($inputJSON);
+
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
 }

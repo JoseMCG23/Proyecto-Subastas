@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Layers,
-  Filter,
+ 
   Wrench,
   LogIn,
   UserPlus,
@@ -27,44 +27,83 @@ import {
   MenubarItem,
 } from "@/components/ui/menubar";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
-
-
-
-
+import { useUser } from "@/hooks/useUser";
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
- 
-  const userEmail = "Invitado";
+  const { user, isAuthenticated, clearUser, authorize } = useUser();
 
-  
+  const userLabel = user?.correo || user?.nombre || "Invitado";
+
   const funkoItems = [
-    { title: "Catálogo de Subastas", href: "/subastas", icon: <Boxes className="h-4 w-4" /> },
-    { title: "Ver Funkos", href: "/funkos", icon: <Sparkles className="h-4 w-4" /> },
-    { title: "Filtrar", href: "/subastas", icon: <Filter className="h-4 w-4" /> },
+    {
+      title: "Catálogo de Subastas",
+      href: "/subastas",
+      icon: <Boxes className="h-4 w-4" />,
+      show: true,
+    },
+    {
+      title: "Ver Funkos",
+      href: "/funkos",
+      icon: <Sparkles className="h-4 w-4" />,
+      show: true,
+    },
   ];
 
   const mantItems = [
-    { title: "Usuarios", href: "/users", icon: <Wrench className="h-4 w-4" /> },
-    { title: "Funkos", href: "/funkos", icon: <Wrench className="h-4 w-4" /> },
-    { title: "Subastas", href: "/mantenimiento-subastas", icon: <Gavel className="h-4 w-4" /> },
+    {
+      title: "Usuarios",
+      href: "/users",
+      icon: <Wrench className="h-4 w-4" />,
+      show: authorize(["Administrador"]),
+    },
+    {
+      title: "Funkos",
+      href: "/funkos",
+      icon: <Wrench className="h-4 w-4" />,
+      show: authorize(["Vendedor", "Administrador"]),
+    },
+    {
+      title: "Subastas",
+      href: "/mantenimiento-subastas",
+      icon: <Gavel className="h-4 w-4" />,
+      show: authorize(["Vendedor", "Administrador"]),
+    },
   ];
 
   const userItems = [
-    { title: "Login", href: "/user/login", icon: <LogIn className="h-4 w-4" /> },
-    { title: "Registrarse", href: "/user/create", icon: <UserPlus className="h-4 w-4" /> },
-    { title: "Logout", href: "#logout", icon: <LogOut className="h-4 w-4" /> },
+    {
+      title: "Login",
+      href: "/login",
+      icon: <LogIn className="h-4 w-4" />,
+      show: !isAuthenticated,
+    },
+    {
+      title: "Registrarse",
+      href: "/register",
+      icon: <UserPlus className="h-4 w-4" />,
+      show: !isAuthenticated,
+    },
+    {
+      title: "Logout",
+      href: "/",
+      icon: <LogOut className="h-4 w-4" />,
+      show: isAuthenticated,
+      action: () => {
+        clearUser();
+        setMobileOpen(false);
+      },
+    },
   ];
 
   return (
     <header className="fixed top-0 left-0 z-50 w-full border-b border-white/10 bg-neutral-950/70 backdrop-blur-xl">
       <div className="mx-auto flex max-w-[1280px] items-center justify-between px-6 py-3 text-white">
-        {/* -------- logo ------------------------------------------------------------------ */}
         <Link
           to="/"
           className="flex items-center gap-2 text-sm font-semibold tracking-wide hover:opacity-90 transition"
-        >{/* para aumentar el tamaño del logo */}
+        >
           <img
             src={logo}
             alt="SubastasFunko"
@@ -72,30 +111,29 @@ export default function Header() {
           />
         </Link>
 
-        {/* -------- menú  -------- ---------------------------------------------------------*/}
         <div className="hidden md:flex flex-1 justify-center">
           <Menubar className="w-auto bg-transparent border-none shadow-none gap-4">
-            {/* Funkos */}
             <MenubarMenu>
               <MenubarTrigger className="text-white/80 font-medium flex items-center gap-2 hover:text-white transition data-[state=open]:text-white">
                 <Sparkles className="h-4 w-4" /> Funkos
                 <ChevronDown className="h-3 w-3 opacity-70" />
               </MenubarTrigger>
               <MenubarContent className="bg-neutral-950/95 backdrop-blur-md border-white/10 text-white">
-                {funkoItems.map((item) => (
-                  <MenubarItem key={item.href} asChild>
-                    <Link
-                      to={item.href}
-                      className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-white/10 transition"
-                    >
-                      {item.icon} {item.title}
-                    </Link>
-                  </MenubarItem>
-                ))}
+                {funkoItems
+                  .filter((item) => item.show)
+                  .map((item) => (
+                    <MenubarItem key={item.href} asChild>
+                      <Link
+                        to={item.href}
+                        className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-white/10 transition"
+                      >
+                        {item.icon} {item.title}
+                      </Link>
+                    </MenubarItem>
+                  ))}
               </MenubarContent>
             </MenubarMenu>
 
-            {/*mant */}
             <MenubarMenu>
               <MenubarTrigger className="text-white/80 font-medium flex items-center gap-2 hover:text-white transition data-[state=open]:text-white">
                 <Layers className="h-4 w-4" /> Mantenimientos
@@ -103,42 +141,45 @@ export default function Header() {
               </MenubarTrigger>
 
               <MenubarContent className="bg-neutral-950/95 backdrop-blur-md border-white/10 text-white">
-                {mantItems.map((item) => (
-                  <MenubarItem key={item.href} asChild>
-                    <Link
-                      to={item.href}
-                      className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-white/10 transition"
-                    >
-                      {item.icon} {item.title}
-                    </Link>
-                  </MenubarItem>
-                ))}
+                {mantItems
+                  .filter((item) => item.show)
+                  .map((item) => (
+                    <MenubarItem key={item.href} asChild>
+                      <Link
+                        to={item.href}
+                        className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-white/10 transition"
+                      >
+                        {item.icon} {item.title}
+                      </Link>
+                    </MenubarItem>
+                  ))}
               </MenubarContent>
             </MenubarMenu>
 
-            {/*usuario */}
             <MenubarMenu>
               <MenubarTrigger className="text-white/80 font-medium flex items-center gap-2 hover:text-white transition data-[state=open]:text-white">
-                <User className="h-4 w-4" /> {userEmail}
+                <User className="h-4 w-4" /> {userLabel}
                 <ChevronDown className="h-3 w-3 opacity-70" />
               </MenubarTrigger>
               <MenubarContent className="bg-neutral-950/95 backdrop-blur-md border-white/10 text-white">
-                {userItems.map((item) => (
-                  <MenubarItem key={item.href} asChild>
-                    <Link
-                      to={item.href}
-                      className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-white/10 transition"
-                    >
-                      {item.icon} {item.title}
-                    </Link>
-                  </MenubarItem>
-                ))}
+                {userItems
+                  .filter((item) => item.show)
+                  .map((item) => (
+                    <MenubarItem key={item.href} asChild>
+                      <Link
+                        to={item.href}
+                        onClick={() => item.action && item.action()}
+                        className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-white/10 transition"
+                      >
+                        {item.icon} {item.title}
+                      </Link>
+                    </MenubarItem>
+                  ))}
               </MenubarContent>
             </MenubarMenu>
           </Menubar>
         </div>
 
-        {/* -------- carrito -------- */}
         <div className="flex items-center gap-3">
           <Link
             to="/cart"
@@ -153,7 +194,6 @@ export default function Header() {
             </Badge>
           </Link>
 
-          {/* Menú */}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
               <button className="md:hidden grid h-10 w-10 place-items-center rounded-full bg-white/5 ring-1 ring-white/10 hover:bg-white/10 transition">
@@ -173,42 +213,51 @@ export default function Header() {
 
               <nav className="mt-8 space-y-6">
                 <Section title="Funkos" icon={<Sparkles className="h-4 w-4" />}>
-                  {funkoItems.map((item) => (
-                    <Link
-                      key={item.href}
-                      to={item.href}
-                      onClick={() => setMobileOpen(false)}
-                      className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white transition"
-                    >
-                      {item.icon} {item.title}
-                    </Link>
-                  ))}
+                  {funkoItems
+                    .filter((item) => item.show)
+                    .map((item) => (
+                      <Link
+                        key={item.href}
+                        to={item.href}
+                        onClick={() => setMobileOpen(false)}
+                        className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white transition"
+                      >
+                        {item.icon} {item.title}
+                      </Link>
+                    ))}
                 </Section>
 
                 <Section title="Mantenimientos" icon={<Layers className="h-4 w-4" />}>
-                  {mantItems.map((item) => (
-                    <Link
-                      key={item.href}
-                      to={item.href}
-                      onClick={() => setMobileOpen(false)}
-                      className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white transition"
-                    >
-                      {item.icon} {item.title}
-                    </Link>
-                  ))}
+                  {mantItems
+                    .filter((item) => item.show)
+                    .map((item) => (
+                      <Link
+                        key={item.href}
+                        to={item.href}
+                        onClick={() => setMobileOpen(false)}
+                        className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white transition"
+                      >
+                        {item.icon} {item.title}
+                      </Link>
+                    ))}
                 </Section>
 
-                <Section title={userEmail} icon={<User className="h-4 w-4" />}>
-                  {userItems.map((item) => (
-                    <Link
-                      key={item.href}
-                      to={item.href}
-                      onClick={() => setMobileOpen(false)}
-                      className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white transition"
-                    >
-                      {item.icon} {item.title}
-                    </Link>
-                  ))}
+                <Section title={userLabel} icon={<User className="h-4 w-4" />}>
+                  {userItems
+                    .filter((item) => item.show)
+                    .map((item) => (
+                      <Link
+                        key={item.href}
+                        to={item.href}
+                        onClick={() => {
+                          if (item.action) item.action();
+                          else setMobileOpen(false);
+                        }}
+                        className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white transition"
+                      >
+                        {item.icon} {item.title}
+                      </Link>
+                    ))}
                 </Section>
               </nav>
             </SheetContent>
