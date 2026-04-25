@@ -14,16 +14,19 @@ import ImageService from "@/services/ImageService";
 
 import { FunkoForm } from "@/components/funko/Form/FunkoForm";
 
-const usuarioActual = {
-    id: 4,
-    nombre: "Usuario Vendedor Simulado",
-};
+import { useUser } from "@/hooks/useUser";
+
+
 
 const MAX_IMAGE_SIZE_MB = 5;
 
 export function FunkoCreate() {
     const navigate = useNavigate();
-
+    const { user } = useUser();
+    const usuarioActual = {
+        id: user?.id,
+        nombre: user?.nombre,
+    };
     const [dataCategorias, setDataCategorias] = useState([]);
     const [files, setFiles] = useState([]);
     const [fileURLs, setFileURLs] = useState([]);
@@ -65,8 +68,8 @@ export function FunkoCreate() {
             nombre: "",
             descripcion: "",
             condicion: "",
-            estado: "Activo",
-            vendedor_id: usuarioActual.id,
+            estado: "DISPONIBLE",
+            vendedor_id: user?.id || "",
             categorias: [],
             imagenes: [{ urlImagen: "" }],
         },
@@ -151,13 +154,18 @@ export function FunkoCreate() {
             return;
         }
 
+        if (!user?.id) {
+            toast.error("Debe iniciar sesión para registrar un funko");
+            return;
+        }
+
         try {
             const formDataFunko = {
                 nombre: dataForm.nombre,
                 descripcion: dataForm.descripcion,
                 condicion: dataForm.condicion,
-                estado: "Activo",
-                vendedor_id: usuarioActual.id,
+                estado: "DISPONIBLE",
+                vendedor_id: user?.id,
                 categorias: dataForm.categorias,
                 imagenes: validFiles.map((file) => file.name),
             };

@@ -16,6 +16,9 @@ import {
   Sparkles,
   Gavel,
   Boxes,
+  History,
+  IdCard,
+  BarChart3,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -70,6 +73,12 @@ export default function Header() {
       icon: <Gavel className="h-4 w-4" />,
       show: authorize(["Vendedor", "Administrador"]),
     },
+    {
+      title: "Reporte de subastas",
+      href: "/reportes/subastas-estado",
+      icon: <BarChart3 className="h-4 w-4" />,
+      show: authorize(["Administrador"]),
+    },
   ];
 
   const userItems = [
@@ -84,6 +93,18 @@ export default function Header() {
       href: "/register",
       icon: <UserPlus className="h-4 w-4" />,
       show: !isAuthenticated,
+    },
+    {
+      title: "Historial",
+      href: "/mis-pujas",
+      icon: <History className="h-4 w-4" />,
+      show: isAuthenticated && authorize(["Comprador"]),
+    },
+    {
+      title: "Ver perfil",
+      href: "/mi-perfil",
+      icon: <IdCard className="h-4 w-4" />,
+      show: isAuthenticated && authorize(["Administrador"]),
     },
     {
       title: "Logout",

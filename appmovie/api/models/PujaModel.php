@@ -25,14 +25,35 @@ class PujaModel{
     }
 
     //pujas por usuario
-    public function getByUsuario($idUsuario){
-        $sql = "SELECT p.idPuja, p.subastaId, p.monto, p.fechaYhora FROM Puja p WHERE p.usuarioId = $idUsuario ORDER BY p.fechaYhora DESC;";
+    public function getByUsuario($idUsuario)
+{
+    $sql = "SELECT 
+                p.idPuja,
+                p.subastaId,
+                p.usuarioId,
+                p.monto,
+                p.fechaYhora,
 
-        return $this->enlace->ExecuteSQL($sql);
-    }
+                s.idsubasta,
+                s.estado AS estadoSubasta,
+                s.precioBase,
+                s.incre_minimo,
+                s.fechaInicio,
+                s.fechafin,
 
+                f.idFunko,
+                f.nombre AS nombreFunko,
+                f.descripcion AS descripcionFunko,
+                f.imagen_portada
 
+            FROM Puja p
+            INNER JOIN subasta s ON p.subastaId = s.idsubasta
+            INNER JOIN Funko f ON s.funko_id = f.idFunko
+            WHERE p.usuarioId = $idUsuario
+            ORDER BY p.fechaYhora DESC;";
 
+    return $this->enlace->ExecuteSQL($sql);
+}
 
 
 

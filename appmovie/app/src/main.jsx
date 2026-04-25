@@ -20,6 +20,9 @@ import Login from "@/components/User/Login";
 import Register from "@/components/User/Register";
 import UserUpdate from "@/components/User/UserUpdate";
 
+//Jose perfil del usuario xd
+import MiPerfil from "@/components/User/MiPerfil";
+
 /////nuevo de cris de funko
 import FunkoList from "@/components/Funko/FunkoList";
 import FunkoCreate from "@/components/Funko/FunkoCreate";
@@ -34,8 +37,14 @@ import { SubastaVista } from "@/components/subasta/SubastaVista";
 //import historial de pujas 
 import { HistorialPujas } from "@/components/pujas/HistorialPujas";
 
+//import historia de pujas del usuario
+import { MisPujas } from "@/components/pujas/MisPujas";
+
 //import mantenimiento subasta
 import { MantenimientoSubasta } from "@/components/subasta/MantenimientoSubasta";
+
+//Reporte
+import { ReporteSubastasEstado } from "@/components/reportes/ReporteSubastasEstado";
 
 // auth
 import RoleRoute from "@/components/Auth/RoleRoute";
@@ -80,6 +89,14 @@ const rutas = createBrowserRouter([
           </RoleRoute>
         ),
       },
+      {
+        path: "mi-perfil",
+        element: (
+          <RoleRoute requiredRoles={["Administrador"]}>
+            <MiPerfil />
+          </RoleRoute>
+        ),
+      },
 
       // Rutas de funko
       { path: "funkos", element: <FunkoList /> },
@@ -109,10 +126,31 @@ const rutas = createBrowserRouter([
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
 
+      // Ruta reporte de subastas por estado
+      {
+        path: "reportes/subastas-estado",
+        element: (
+          <RoleRoute requiredRoles={["Administrador"]}>
+            <ReporteSubastasEstado />
+          </RoleRoute>
+        ),
+      },
+
       // Rutas subastas
       { path: "subastas", element: <SubastaCatalogo /> },
       { path: "subastas/:id", element: <SubastaVista /> },
       { path: "subastas/:id/pujas", element: <HistorialPujas /> },
+
+      // Ruta historial de pujas del usuario
+      {
+        path: "mis-pujas",
+        element: (
+          <RoleRoute requiredRoles={["Comprador"]}>
+            <MisPujas />
+          </RoleRoute>
+        ),
+      },
+
       {
         path: "mantenimiento-subastas",
         element: (

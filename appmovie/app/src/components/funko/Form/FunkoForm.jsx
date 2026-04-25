@@ -234,7 +234,7 @@ export function FunkoForm({
                         <div>
                             <FieldLabel icon={ShieldCheck}>Estado inicial</FieldLabel>
                             <Input
-                                value="Activo"
+                                value="DISPONIBLE"
                                 disabled
                                 className="h-11 rounded-2xl border-slate-700/80 bg-slate-900 text-slate-300 disabled:opacity-100"
                             />

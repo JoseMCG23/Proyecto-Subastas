@@ -121,4 +121,17 @@ class subasta
             handleException($e);
         }
     }
+
+    // Reporte por estado
+    public function reportePorEstado()
+    {
+        try {
+            $response = new Response();
+            $m = new SubastaModel();
+            $result = $m->reportePorEstado();
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
 }

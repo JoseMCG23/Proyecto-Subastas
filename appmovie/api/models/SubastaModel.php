@@ -537,7 +537,20 @@ class SubastaModel {
         throw new Exception("No se puede cancelar la subasta");
     }
 
-    
+    public function reportePorEstado()
+    {
+        $this->sincronizarTodasPorFecha();
+
+        $sql = "SELECT 
+                    estado,
+                    COUNT(*) AS total
+                FROM subasta
+                WHERE estado IN ('ACTIVA', 'FINALIZADA', 'CANCELADA')
+                GROUP BY estado
+                ORDER BY estado ASC;";
+
+        return $this->enlace->ExecuteSQL($sql);
+    }
 
     
 }

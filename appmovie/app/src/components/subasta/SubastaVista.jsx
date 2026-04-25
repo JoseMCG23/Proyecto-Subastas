@@ -3,14 +3,16 @@ import { useParams, Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import Pusher from "pusher-js";
 import SubastaService from "@/services/SubastaService";
+import { useUser } from "@/hooks/useUser";
 
 const API_UPLOADS = "http://localhost:81/appmovie/api/uploads";
 
-// variable pruebas 6= saray 5=abraham
-const usuarioActualId = Number(import.meta.env.VITE_USUARIO_ACTUAL_ID || 5);
+
 
 export function SubastaVista() {
     const { id } = useParams();
+    const { user } = useUser();
+    const usuarioActualId = Number(user?.id);
     const [subasta, setSubasta] = useState(null);
     const [resultadoCierre, setResultadoCierre] = useState(null);
     const [montoPuja, setMontoPuja] = useState("");
@@ -193,6 +195,12 @@ export function SubastaVista() {
 
     const handlePujar = async (e) => {
         e.preventDefault();
+
+
+        if (!usuarioActualId) {
+            toast.error("Debe iniciar sesión para realizar una puja");
+            return;
+        }
 
         if (!puedePujar) {
             toast.error("No se puede pujar en esta subasta");
@@ -499,8 +507,8 @@ export function SubastaVista() {
 
                                 <input
                                     type="number"
-                                    min="1"
-                                    step="1"
+                                    min="500"
+                                    step="500"
                                     value={montoPuja}
                                     onChange={(e) => setMontoPuja(e.target.value)}
                                     placeholder="Ingrese el monto de la puja"
