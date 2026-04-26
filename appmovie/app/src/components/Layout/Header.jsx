@@ -37,7 +37,7 @@ export default function Header() {
 
   const { user, isAuthenticated, clearUser, authorize } = useUser();
 
-  const userLabel = user?.correo || user?.nombre || "Invitado";
+  const userLabel = user?.nombre || user?.correo || "Invitado";
 
   const funkoItems = [
     {
@@ -47,7 +47,7 @@ export default function Header() {
       show: true,
     },
     {
-      title: "Ver Funkos",
+      title: "Cátalogo de Funkos",
       href: "/funkos",
       icon: <Sparkles className="h-4 w-4" />,
       show: true,
@@ -83,7 +83,7 @@ export default function Header() {
 
   const userItems = [
     {
-      title: "Login",
+      title: "Iniciar sesión",
       href: "/login",
       icon: <LogIn className="h-4 w-4" />,
       show: !isAuthenticated,
@@ -107,7 +107,7 @@ export default function Header() {
       show: isAuthenticated && authorize(["Administrador"]),
     },
     {
-      title: "Logout",
+      title: "Cerrar sesión",
       href: "/",
       icon: <LogOut className="h-4 w-4" />,
       show: isAuthenticated,
@@ -136,7 +136,7 @@ export default function Header() {
           <Menubar className="w-auto bg-transparent border-none shadow-none gap-4">
             <MenubarMenu>
               <MenubarTrigger className="text-white/80 font-medium flex items-center gap-2 hover:text-white transition data-[state=open]:text-white">
-                <Sparkles className="h-4 w-4" /> Funkos
+                <Sparkles className="h-4 w-4" /> Cátalogos
                 <ChevronDown className="h-3 w-3 opacity-70" />
               </MenubarTrigger>
               <MenubarContent className="bg-neutral-950/95 backdrop-blur-md border-white/10 text-white">
