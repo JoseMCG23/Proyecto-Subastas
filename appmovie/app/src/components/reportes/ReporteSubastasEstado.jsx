@@ -141,7 +141,7 @@ export function ReporteSubastasEstado() {
                                 <Bar
                                     dataKey="total"
                                     name="Cantidad de subastas"
-                                    fill="#00bcd4"
+                                    fill="#8b5cf6"
                                     radius={[4, 4, 0, 0]}
                                 />
                             </BarChart>

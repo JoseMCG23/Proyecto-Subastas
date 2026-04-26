@@ -1,5 +1,5 @@
 import { useUser } from "@/hooks/useUser";
-import { UserRound, ShieldCheck, Mail, BadgeCheck } from "lucide-react";
+import { UserRound, ShieldCheck, Mail } from "lucide-react";
 
 export default function MiPerfil() {
     const { user } = useUser();
@@ -20,7 +20,6 @@ export default function MiPerfil() {
 
     const correo = user.correo || user.email || "-";
     const rol = user.rol || "-";
-    const estado = user.estado || "-";
 
     return (
         <div className="min-h-screen bg-neutral-950 px-6 pt-32 pb-16 text-white">
@@ -62,14 +61,6 @@ export default function MiPerfil() {
                                 <span className="text-sm font-semibold">Rol</span>
                             </div>
                             <p className="text-white">{rol}</p>
-                        </div>
-
-                        <div className="rounded-2xl border border-white/10 bg-neutral-950/40 p-5">
-                            <div className="mb-2 flex items-center gap-2 text-white/80">
-                                <BadgeCheck className="h-4 w-4 text-white/50" />
-                                <span className="text-sm font-semibold">Estado</span>
-                            </div>
-                            <p className="text-white">{estado}</p>
                         </div>
 
                         <div className="rounded-2xl border border-white/10 bg-neutral-950/40 p-5">
